@@ -1,0 +1,3302 @@
+﻿diff --git a/src/main/java/me/zombie_striker/customitemmanager/OLD_ItemFact.java b/src/main/java/me/zombie_striker/customitemmanager/OLD_ItemFact.java
+index d2dff8d..038a7f7 100644
+--- a/src/main/java/me/zombie_striker/customitemmanager/OLD_ItemFact.java
++++ b/src/main/java/me/zombie_striker/customitemmanager/OLD_ItemFact.java
+@@ -46,7 +46,6 @@ public class OLD_ItemFact {
+ 		}
+ 	}
+ 
+-
+ 	public static List<String> addShopLore(CustomBaseObject obj) {
+ 		List<String> lore = new ArrayList<>();
+ 		if ((obj).getCraftingReturn() > 1)
+@@ -65,7 +64,8 @@ public class OLD_ItemFact {
+ 				StringBuilder sb = new StringBuilder();
+ 				// Chris: itemName from message.yml
+ 				String itemName = is.getType().name();
+-				sb.append(ChatColor.RED + "- " + QAMain.findCraftEntityName(itemName, itemName) + " x " + is.getAmount());
++				sb.append(
++						ChatColor.RED + "- " + QAMain.findCraftEntityName(itemName, itemName) + " x " + is.getAmount());
+ 				if (is.getDurability() != 0)
+ 					sb.append(":" + is.getDurability());
+ 				lore.add(sb.toString());
+@@ -90,14 +90,16 @@ public class OLD_ItemFact {
+ 			im = ironsights.getItemMeta();
+ 			im.setCustomModelData(IronsightsHandler.ironsightsData);
+ 		} catch (Error | Exception e4) {
+-			ironsights = new ItemStack(IronsightsHandler.ironsightsMaterial, 1, (short) IronsightsHandler.ironsightsData);
++			ironsights = new ItemStack(IronsightsHandler.ironsightsMaterial, 1,
++					(short) IronsightsHandler.ironsightsData);
+ 			im = ironsights.getItemMeta();
+ 		}
+ 		im.setDisplayName(IronsightsHandler.ironsightsDisplay);
+ 		if (QAMain.ITEM_enableUnbreakable) {
+ 			try {
+ 				im.setUnbreakable(true);
+-			} catch (Error | Exception e3423) {			}
++			} catch (Error | Exception e3423) {
++			}
+ 		}
+ 		try {
+ 			if (QAMain.ITEM_enableUnbreakable) {
+@@ -121,21 +123,24 @@ public class OLD_ItemFact {
+ 	}
+ 
+ 	public static void addVariantData(ItemMeta im, List<String> lore, int var) {
+-		/*try {
+-			if(im!=null)
+-				im.setCustomModelData(var);
+-		} catch (Error | Exception e4) {*/
+-			boolean b = false;
+-			if(lore == null){
+-				b=  true;
+-				lore = new ArrayList<>();
+-			}
+-			lore.add(QAMain.S_ITEM_VARIANTS_NEW + " " + var);
+-			if(b)
+-				if(im!=null)
+-				im.setLore(lore);
++		/*
++		 * try {
++		 * if(im!=null)
++		 * im.setCustomModelData(var);
++		 * } catch (Error | Exception e4) {
++		 */
++		boolean b = false;
++		if (lore == null) {
++			b = true;
++			lore = new ArrayList<>();
+ 		}
+-	//}
+-
++		// Add variant data but make it invisible by using ChatColor.RESET with no
++		// visible text
++		lore.add(ChatColor.RESET + "" + ChatColor.DARK_GRAY + QAMain.S_ITEM_VARIANTS_NEW + " " + var);
++		if (b)
++			if (im != null)
++				im.setLore(lore);
++	}
++	// }
+ 
+ }
+diff --git a/src/main/java/me/zombie_striker/qg/QAMain.java b/src/main/java/me/zombie_striker/qg/QAMain.java
+index 0ee89f5..f2fd35b 100644
+--- a/src/main/java/me/zombie_striker/qg/QAMain.java
++++ b/src/main/java/me/zombie_striker/qg/QAMain.java
+@@ -1,5 +1,9 @@
+ package me.zombie_striker.qg;
+ 
++import me.zombie_striker.qg.guns.reloaders.*;
++import me.zombie_striker.qg.magazines.MagazineListener;
++import me.zombie_striker.qg.magazines.MagazineManager;
++import me.zombie_striker.qg.config.MagazineYMLLoader;
+ import com.cryptomorin.xseries.XPotion;
+ import com.cryptomorin.xseries.reflection.XReflection;
+ import de.tr7zw.changeme.nbtapi.NBT;
+@@ -26,10 +30,6 @@ import me.zombie_striker.qg.config.MessagesYML;
+ import me.zombie_striker.qg.guns.Gun;
+ import me.zombie_striker.qg.guns.chargers.*;
+ import me.zombie_striker.qg.guns.projectiles.*;
+-import me.zombie_striker.qg.guns.reloaders.M1GarandReloader;
+-import me.zombie_striker.qg.guns.reloaders.PumpactionReloader;
+-import me.zombie_striker.qg.guns.reloaders.SingleBulletReloader;
+-import me.zombie_striker.qg.guns.reloaders.SlideReloader;
+ import me.zombie_striker.qg.guns.utils.GunRefillerRunnable;
+ import me.zombie_striker.qg.guns.utils.WeaponSounds;
+ import me.zombie_striker.qg.handlers.*;
+@@ -84,6 +84,7 @@ public class QAMain extends JavaPlugin {
+ 
+     public static final int ViaVersionIdfor_1_8 = 106;
+     public static HashMap<MaterialStorage, Gun> gunRegister = new LinkedHashMap<>();
++    public static HashMap<MaterialStorage, me.zombie_striker.qg.magazines.Magazine> magazineRegister = new LinkedHashMap<>();
+     public static HashMap<MaterialStorage, Ammo> ammoRegister = new LinkedHashMap<>();
+     public static HashMap<MaterialStorage, CustomBaseObject> miscRegister = new LinkedHashMap<>();
+     public static HashMap<MaterialStorage, ArmorObject> armorRegister = new LinkedHashMap<>();
+@@ -255,8 +256,8 @@ public class QAMain extends JavaPlugin {
+     public static boolean AUTOUPDATE = true;
+     public static boolean SWAP_TO_LMB_SHOOT = true;
+     public static boolean SHOW_BULLETS_LORE = false;
+-    public static boolean ENABLE_LORE_INFO = true;
+-    public static boolean ENABLE_LORE_HELP = true;
++    public static boolean ENABLE_LORE_INFO = false;
++    public static boolean ENABLE_LORE_HELP = false;
+     public static boolean AutoDetectResourcepackVersion = true;
+     public static boolean ITEM_enableUnbreakable = true;// TODO :stuufff
+     public static boolean MANUALLYSELECT18 = false;
+@@ -688,6 +689,7 @@ public class QAMain extends JavaPlugin {
+ 
+         Bukkit.getPluginManager().registerEvents(new QAListener(), this);
+         Bukkit.getPluginManager().registerEvents(new AimManager(), this);
++        Bukkit.getPluginManager().registerEvents(new MagazineListener(), this);
+         try {
+             if (Bukkit.getPluginManager().isPluginEnabled("ChestShop"))
+                 Bukkit.getPluginManager().registerEvents(new ChestShopHandler(), this);
+@@ -783,6 +785,7 @@ public class QAMain extends JavaPlugin {
+         new SingleBulletReloader();
+         new SlideReloader();
+         new M1GarandReloader();
++        new MagazineReloader();
+ 
+         new MiniNukeProjectile();
+         new ExplodingRoundProjectile();
+@@ -1196,6 +1199,9 @@ public class QAMain extends JavaPlugin {
+         GunYMLLoader.loadGuns(this);
+         GunYMLLoader.loadAttachments(this);
+         GunYMLLoader.loadArmor(this);
++        MagazineManager.clear();
++        magazineRegister.clear();
++        MagazineYMLLoader.loadMagazines(this);
+         if (QAMain.enableBleeding)
+             BulletWoundHandler.startTimer();
+ 
+@@ -1343,6 +1349,7 @@ public class QAMain extends JavaPlugin {
+                     sender.sendMessage(prefix + ChatColor.WHITE + " This server is using version " + ChatColor.GREEN
+                                        + this.getDescription().getVersion() + ChatColor.WHITE + " of QualityArmory");
+                     sender.sendMessage("--==Changelog==--");
++                    sender.sendMessage(ChatColor.GREEN + "Versione Diverso");
+                     if (changelog == null) {
+                         StringBuilder builder = new StringBuilder();
+ 
+diff --git a/src/main/java/me/zombie_striker/qg/api/QADamageEvent.java b/src/main/java/me/zombie_striker/qg/api/QADamageEvent.java
+index f0b8396..9747e30 100644
+--- a/src/main/java/me/zombie_striker/qg/api/QADamageEvent.java
++++ b/src/main/java/me/zombie_striker/qg/api/QADamageEvent.java
+@@ -13,14 +13,20 @@ public class QADamageEvent extends Event implements Cancellable {
+     private final Entity damaged;
+     private final Gun gun;
+     private double damage;
++    private final boolean isHeadshot;
+ 
+     private boolean cancelled;
+ 
+     public QADamageEvent(Entity damager, Entity damaged, Gun gun, double damage) {
++        this(damager, damaged, gun, damage, false);
++    }
++
++    public QADamageEvent(Entity damager, Entity damaged, Gun gun, double damage, boolean isHeadshot) {
+         this.damager = damager;
+         this.damaged = damaged;
+         this.gun = gun;
+         this.damage = damage;
++        this.isHeadshot = isHeadshot;
+     }
+ 
+     public static HandlerList getHandlerList() {
+@@ -62,4 +68,8 @@ public class QADamageEvent extends Event implements Cancellable {
+         return damager;
+     }
+ 
++    public boolean isHeadshot() {
++        return isHeadshot;
++    }
++
+ }
+diff --git a/src/main/java/me/zombie_striker/qg/api/QualityArmory.java b/src/main/java/me/zombie_striker/qg/api/QualityArmory.java
+index 1442cce..469dee6 100644
+--- a/src/main/java/me/zombie_striker/qg/api/QualityArmory.java
++++ b/src/main/java/me/zombie_striker/qg/api/QualityArmory.java
+@@ -6,6 +6,7 @@ import java.util.Iterator;
+ import java.util.List;
+ import java.util.Map.Entry;
+ 
++import de.tr7zw.changeme.nbtapi.NBT;
+ import me.zombie_striker.customitemmanager.*;
+ import me.zombie_striker.qg.handlers.HotbarMessager;
+ import me.zombie_striker.qg.handlers.IronsightsHandler;
+@@ -521,6 +522,26 @@ public class QualityArmory {
+ 		}
+ 	}
+ 
++	public static void setAmmo(Gun g, ItemStack current, int amount) {
++		NBT.modify(current, nbt -> {
++			nbt.setInteger("ammo", amount);
++		});
++
++		Gun.updateAmmoLore(g, current, amount);
++	}
++
++	public static int getAmmo(Gun g, ItemStack current) {
++		return NBT.get(current, nbt -> {
++			if (nbt.hasTag("ammo")) {  // oppure hasKey() dipende dalla versione
++				return nbt.getInteger("ammo");
++			}
++			return 0;
++		});
++	}
++
++
++
++
+ 	@SuppressWarnings("deprecation")
+ 	public static int findSafeSpot(ItemStack newItem, boolean findHighest, boolean allowPockets) {
+ 		if(CustomItemManager.isUsingCustomData())
+diff --git a/src/main/java/me/zombie_striker/qg/config/GunYML.java b/src/main/java/me/zombie_striker/qg/config/GunYML.java
+index 854e224..f398cfe 100644
+--- a/src/main/java/me/zombie_striker/qg/config/GunYML.java
++++ b/src/main/java/me/zombie_striker/qg/config/GunYML.java
+@@ -39,7 +39,9 @@ public class GunYML extends ArmoryYML {
+ 		verify("unlimitedAmmo", false);
+ 		verify("LightLeveOnShoot", 14);
+ 		verify("recoil", 1);
++		verify("visualRecoil", 0.06);
+ 		verify("slownessOnEquip", 0);
++		verify("bulletSpread", 0.1);
+ 
+ 		verify("particles.bullet_particle", "REDSTONE");
+ 		verify("particles.bullet_particleR", 1);
+@@ -61,14 +63,16 @@ public class GunYML extends ArmoryYML {
+ 		verify("weaponsounds", WeaponSounds.getSoundByType(WeaponType.RIFLE));
+ 		try {
+ 			verify("weaponsounds_reloadingSound",
+-					get("ReloadingHandler") != null ?
+-							((ReloadingManager.getHandler((String) get("ReloadingHandler")).getDefaultReloadingSound()))
++					get("ReloadingHandler") != null
++							? ((ReloadingManager.getHandler((String) get("ReloadingHandler"))
++									.getDefaultReloadingSound()))
+ 							: WeaponSounds.RELOAD_MAG_OUT.getSoundName());
+ 			verify("weaponsounds_chargingSound",
+-					get("ChargingHandler") != null ?
+-							((ChargingManager.getHandler((String) get("ChargingHandler")).getDefaultChargingSound()))
++					get("ChargingHandler") != null
++							? ((ChargingManager.getHandler((String) get("ChargingHandler")).getDefaultChargingSound()))
+ 							: WeaponSounds.RELOAD_BOLT.getSoundName());
+-		}catch (Error|Exception e5){}
++		} catch (Error | Exception e5) {
++		}
+ 
+ 		verify("sway.sneakModifier", true);
+ 		verify("sway.moveModifier", true);
+@@ -83,15 +87,17 @@ public class GunYML extends ArmoryYML {
+ 		set(false, "weaponsounds_reloadingSound", sound);
+ 		return this;
+ 	}
++
+ 	public GunYML setReloadingSound(WeaponSounds sound) {
+ 		set(false, "weaponsounds_reloadingSound", sound.getSoundName());
+ 		return this;
+ 	}
+ 
+ 	public GunYML setWeaponSound(WeaponSounds sound) {
+-		set( "weaponsounds", sound.getSoundName());
++		set("weaponsounds", sound.getSoundName());
+ 		return this;
+ 	}
++
+ 	public GunYML setSwayUnscopedModifier(int sway) {
+ 		set(false, "sway.unscopedModifier", sway);
+ 		return this;
+@@ -116,6 +122,7 @@ public class GunYML extends ArmoryYML {
+ 		set(false, "recoil", recoil);
+ 		return this;
+ 	}
++
+ 	public GunYML setVisualRecoil(double visualRecoil) {
+ 		set(false, "visualRecoil", visualRecoil);
+ 		return this;
+@@ -276,14 +283,19 @@ public class GunYML extends ArmoryYML {
+ 		return this;
+ 	}
+ 
++	public GunYML setBulletSpread(double spread) {
++		set(false, "bulletSpread", spread);
++		return this;
++	}
++
+ 	public GunYML setFireRate(int fireRate) {
+ 		set(false, "firerate", fireRate);
+ 		return this;
+ 	}
+ 
+ 	public GunYML setFullyAutomatic(int shots) {
+-		//set(false, "bullets-per-shot", shots);
+-		//set(false, "ChargingHandler", ChargingManager.RAPIDFIRE);
++		// set(false, "bullets-per-shot", shots);
++		// set(false, "ChargingHandler", ChargingManager.RAPIDFIRE);
+ 		set(false, "firerate", shots);
+ 		set(false, "isAutomatic", true);
+ 		return this;
+@@ -331,7 +343,6 @@ public class GunYML extends ArmoryYML {
+ 		return this;
+ 	}
+ 
+-
+ 	public GunYML setSway_SneakModifier(boolean c) {
+ 		set(false, "sway.sneakModifier", c);
+ 		return this;
+@@ -347,5 +358,4 @@ public class GunYML extends ArmoryYML {
+ 		return this;
+ 	}
+ 
+-
+ }
+diff --git a/src/main/java/me/zombie_striker/qg/config/GunYMLLoader.java b/src/main/java/me/zombie_striker/qg/config/GunYMLLoader.java
+index 6c6012e..8bb3353 100644
+--- a/src/main/java/me/zombie_striker/qg/config/GunYMLLoader.java
++++ b/src/main/java/me/zombie_striker/qg/config/GunYMLLoader.java
+@@ -43,8 +43,8 @@ public class GunYMLLoader {
+ 									: Material.DIAMOND_AXE;
+ 							int variant = f2.contains("variant") ? f2.getInt("variant") : 0;
+ 							final String name = f2.getString("name");
+-							if(QAMain.verboseLoadingLogging)
+-							main.getLogger().info("-Loading AmmoType: " + name);
++							if (QAMain.verboseLoadingLogging)
++								main.getLogger().info("-Loading AmmoType: " + name);
+ 
+ 							String extraData = null;
+ 							if (f2.contains("skull_owner")) {
+@@ -61,13 +61,13 @@ public class GunYMLLoader {
+ 							final ItemStack[] materails = main
+ 									.convertIngredients(f2.getStringList("craftingRequirements"));
+ 							final String displayname = f2.contains("displayname")
+-									? LocalUtils.colorize( f2.getString("displayname"))
++									? LocalUtils.colorize(f2.getString("displayname"))
+ 									: (ChatColor.WHITE + name);
+ 							final List<String> extraLore2 = f2.contains("lore") ? f2.getStringList("lore") : null;
+ 							final List<String> extraLore = new ArrayList<String>();
+ 							try {
+ 								for (String lore : extraLore2) {
+-									extraLore.add(LocalUtils.colorize( lore));
++									extraLore.add(LocalUtils.colorize(lore));
+ 								}
+ 							} catch (Error | Exception re52) {
+ 							}
+@@ -76,8 +76,8 @@ public class GunYMLLoader {
+ 							final boolean allowInShop = f2.getBoolean("allowInShop", true) && price > 0;
+ 
+ 							int amountA = f2.getInt("maxAmount");
+-							if(f2.contains("maxItemStack")) {
+-								amountA=(f2.getInt("maxItemStack"));
++							if (f2.contains("maxItemStack")) {
++								amountA = (f2.getInt("maxItemStack"));
+ 							}
+ 							double piercing = f2.getDouble("piercingSeverity");
+ 
+@@ -106,9 +106,8 @@ public class GunYMLLoader {
+ 					e.printStackTrace();
+ 				}
+ 			}
+-			if(!QAMain.verboseLoadingLogging)
+-				main.getLogger().info("-Loaded "+items+" Ammo types.");
+-
++			if (!QAMain.verboseLoadingLogging)
++				main.getLogger().info("-Loaded " + items + " Ammo types.");
+ 
+ 		}
+ 	}
+@@ -123,8 +122,8 @@ public class GunYMLLoader {
+ 						FileConfiguration f2 = YamlConfiguration.loadConfiguration(f);
+ 						if ((!f2.contains("invalid")) || !f2.getBoolean("invalid")) {
+ 							final String name = f2.getString("name");
+-							if(QAMain.verboseLoadingLogging)
+-							main.getLogger().info("-Loading Armor: " + name);
++							if (QAMain.verboseLoadingLogging)
++								main.getLogger().info("-Loading Armor: " + name);
+ 
+ 							Material m = f2.contains("material") ? Material.matchMaterial(f2.getString("material"))
+ 									: Material.DIAMOND_AXE;
+@@ -133,13 +132,13 @@ public class GunYMLLoader {
+ 							final ItemStack[] materails = main
+ 									.convertIngredients(f2.getStringList("craftingRequirements"));
+ 							final String displayname = f2.contains("displayname")
+-									? LocalUtils.colorize( f2.getString("displayname"))
++									? LocalUtils.colorize(f2.getString("displayname"))
+ 									: (ChatColor.WHITE + name);
+ 							final List<String> rawLore = f2.contains("lore") ? f2.getStringList("lore") : null;
+ 							final List<String> lore = new ArrayList<String>();
+ 							try {
+ 								for (String lore2 : rawLore) {
+-									lore.add(LocalUtils.colorize( lore2));
++									lore.add(LocalUtils.colorize(lore2));
+ 								}
+ 							} catch (Error | Exception re52) {
+ 							}
+@@ -150,7 +149,7 @@ public class GunYMLLoader {
+ 							WeaponType wt = WeaponType.getByName(f2.getString("MiscType"));
+ 
+ 							if (wt == WeaponType.HELMET) {
+-								Helmet helmet = new Helmet(name,displayname,lore,materails,ms,price,allowInShop);
++								Helmet helmet = new Helmet(name, displayname, lore, materails, ms, price, allowInShop);
+ 								helmet.setHeightMax(f2.getDouble("maxProtectionHeight"));
+ 								helmet.setHeightMin(f2.getDouble("minProtectionHeight"));
+ 								helmet.setProtection(f2.getInt("protection", 0));
+@@ -163,8 +162,8 @@ public class GunYMLLoader {
+ 					e.printStackTrace();
+ 				}
+ 			}
+-			if(!QAMain.verboseLoadingLogging)
+-				main.getLogger().info("-Loaded "+items+" Armor types.");
++			if (!QAMain.verboseLoadingLogging)
++				main.getLogger().info("-Loaded " + items + " Armor types.");
+ 		}
+ 	}
+ 
+@@ -187,13 +186,13 @@ public class GunYMLLoader {
+ 							final ItemStack[] materails = main
+ 									.convertIngredients(f2.getStringList("craftingRequirements"));
+ 							final String displayname = f2.contains("displayname")
+-									? LocalUtils.colorize( f2.getString("displayname"))
++									? LocalUtils.colorize(f2.getString("displayname"))
+ 									: (ChatColor.WHITE + name);
+ 							final List<String> rawLore = f2.contains("lore") ? f2.getStringList("lore") : null;
+ 							final List<String> lore = new ArrayList<String>();
+ 							try {
+ 								for (String lore2 : rawLore) {
+-									lore.add(LocalUtils.colorize( lore2));
++									lore.add(LocalUtils.colorize(lore2));
+ 								}
+ 							} catch (Error | Exception re52) {
+ 							}
+@@ -201,7 +200,7 @@ public class GunYMLLoader {
+ 							final int price = f2.contains("price") ? f2.getInt("price") : 100;
+ 							final boolean allowInShop = f2.getBoolean("allowInShop", true) && price > 0;
+ 
+-							int damage = f2.contains("damage") ? f2.getInt("damage") : 1;
++							double damage = f2.contains("damage") ? f2.getDouble("damage") : 1;
+ 							// int durib = f2.contains("durability") ? f2.getInt("durability") : 1000;
+ 
+ 							WeaponType wt = WeaponType.getByName(f2.getString("MiscType"));
+@@ -211,14 +210,14 @@ public class GunYMLLoader {
+ 
+ 							CustomBaseObject base = null;
+ 
+-
+-							String soundEquip =  f2.contains("sound_equip")? f2.getString("sound_equip"):null;
+-							String soundHit =  f2.contains("sound_meleehit")? f2.getString("sound_meleehit"):null;
++							String soundEquip = f2.contains("sound_equip") ? f2.getString("sound_equip") : null;
++							String soundHit = f2.contains("sound_meleehit") ? f2.getString("sound_meleehit") : null;
+ 
+ 							if (wt == WeaponType.MEDKIT)
+-								QAMain.miscRegister.put(ms, base=new MedKit(ms, name, displayname, materails, price));
++								QAMain.miscRegister.put(ms, base = new MedKit(ms, name, displayname, materails, price));
+ 							if (wt == WeaponType.AMMO_BAG)
+-								QAMain.miscRegister.put(ms, base=new AmmoBag(ms, name, displayname, materails, f2.getInt("max", 5), price));
++								QAMain.miscRegister.put(ms, base = new AmmoBag(ms, name, displayname, materails,
++										f2.getInt("max", 5), price));
+ 							if (wt == WeaponType.MELEE) {
+ 								QAMain.miscRegister.put(ms,
+ 										base = new MeleeItems(ms, name, displayname, materails, price, damage));
+@@ -228,36 +227,39 @@ public class GunYMLLoader {
+ 							}
+ 							if (wt == WeaponType.GRENADES)
+ 								QAMain.miscRegister.put(ms,
+-										base=new Grenade(materails, price, damage, radius, name, displayname, lore, ms));
++										base = new Grenade(materails, price, damage, radius, name, displayname, lore,
++												ms));
+ 							if (wt == WeaponType.SMOKE_GRENADES)
+-								QAMain.miscRegister.put(ms, base=new SmokeGrenades(materails, price, damage, radius, name,
+-										displayname, lore, ms));
++								QAMain.miscRegister.put(ms,
++										base = new SmokeGrenades(materails, price, damage, radius, name,
++												displayname, lore, ms));
+ 							if (wt == WeaponType.INCENDARY_GRENADES)
+-								QAMain.miscRegister.put(ms, base=new IncendaryGrenades(materails, price, damage, radius,
+-										name, displayname, lore, ms));
++								QAMain.miscRegister.put(ms,
++										base = new IncendaryGrenades(materails, price, damage, radius,
++												name, displayname, lore, ms));
+ 							if (wt == WeaponType.PROXYMINES)
+-								QAMain.miscRegister.put(ms, base=new ProxyMines(materails, price, damage, radius,
++								QAMain.miscRegister.put(ms, base = new ProxyMines(materails, price, damage, radius,
+ 										name, displayname, lore, ms));
+ 							if (wt == WeaponType.STICKYGRENADE)
+-								QAMain.miscRegister.put(ms, base=new StickyGrenades(materails, price, damage, radius,
++								QAMain.miscRegister.put(ms, base = new StickyGrenades(materails, price, damage, radius,
+ 										name, displayname, lore, ms));
+ 							if (wt == WeaponType.MOLOTOV)
+-								QAMain.miscRegister.put(ms, base=new Molotov(materails, price, damage, radius,
++								QAMain.miscRegister.put(ms, base = new Molotov(materails, price, damage, radius,
+ 										name, displayname, lore, ms));
+ 							if (wt == WeaponType.FLASHBANGS)
+ 								QAMain.miscRegister.put(ms,
+-										base=new Flashbang(materails, price, damage, radius, name, displayname, lore, ms));
+-
++										base = new Flashbang(materails, price, damage, radius, name, displayname, lore,
++												ms));
+ 
+-							if(base!=null) {
++							if (base != null) {
+ 								base.setCustomLore(lore);
+ 								base.setIngredients(materails);
+ 								base.setEnableShop(allowInShop);
+ 							}
+ 
+-							if(f2.contains("maxItemStack"))
++							if (f2.contains("maxItemStack"))
+ 								base.setMaxItemStack(f2.getInt("maxItemStack"));
+-							if(base instanceof ThrowableItems) {
++							if (base instanceof ThrowableItems) {
+ 								ThrowableItems throwableItems = (ThrowableItems) base;
+ 								if (f2.contains("ThrowSpeed"))
+ 									throwableItems.setThrowSpeed(f2.getDouble("ThrowSpeed"));
+@@ -274,50 +276,50 @@ public class GunYMLLoader {
+ 					e.printStackTrace();
+ 				}
+ 			}
+-			if(!QAMain.verboseLoadingLogging)
+-				main.getLogger().info("-Loaded "+items+" Misc.");
++			if (!QAMain.verboseLoadingLogging)
++				main.getLogger().info("-Loaded " + items + " Misc.");
+ 		}
+ 	}
+ 
+ 	public static void loadGuns(QAMain main, File f) {
+-			if (f.getName().contains("yml")) {
+-				FileConfiguration f2 = YamlConfiguration.loadConfiguration(f);
+-				if ((!f2.contains("invalid")) || !f2.getBoolean("invalid")) {
+-					final String name = f2.getString("name");
+-					if(QAMain.verboseLoadingLogging)
++		if (f.getName().contains("yml")) {
++			FileConfiguration f2 = YamlConfiguration.loadConfiguration(f);
++			if ((!f2.contains("invalid")) || !f2.getBoolean("invalid")) {
++				final String name = f2.getString("name");
++				if (QAMain.verboseLoadingLogging)
+ 					main.getLogger().info("-Loading Gun: " + name);
+ 
+-					Material m = f2.contains("material") ? Material.matchMaterial(f2.getString("material"))
+-							: Material.DIAMOND_AXE;
+-					int variant = f2.contains("variant") ? f2.getInt("variant") : 0;
+-					final MaterialStorage ms = MaterialStorage.getMS(m, f2.getInt("id"), variant);
+-					WeaponType weatype = f2.contains("guntype") ? WeaponType.valueOf(f2.getString("guntype"))
+-							: WeaponType.valueOf(f2.getString("weapontype"));
+-					final ItemStack[] materails = main.convertIngredients(f2.getStringList("craftingRequirements"));
+-
+-					final String displayname = f2.contains("displayname")
+-							? LocalUtils.colorize( f2.getString("displayname"))
+-							: (ChatColor.GOLD + name);
+-					final List<String> extraLore2 = f2.contains("lore") ? f2.getStringList("lore") : null;
+-					final List<String> extraLore = new ArrayList<String>();
+-
+-					try {
+-						for (String lore : extraLore2) {
+-							extraLore.add(LocalUtils.colorize( lore));
+-						}
+-					} catch (Error | Exception re52) {
+-					}
+-					if (weatype.isGun()) {
+-						Gun g = new Gun(name, ms);
+-						g.setDisplayname(displayname);
+-						g.setCustomLore(extraLore);
+-						g.setIngredients(materails);
+-						QAMain.gunRegister.put(ms, g);
+-						loadGunSettings(g, f2);
+-					}
++				Material m = f2.contains("material") ? Material.matchMaterial(f2.getString("material"))
++						: Material.DIAMOND_AXE;
++				int variant = f2.contains("variant") ? f2.getInt("variant") : 0;
++				final MaterialStorage ms = MaterialStorage.getMS(m, f2.getInt("id"), variant);
++				WeaponType weatype = f2.contains("guntype") ? WeaponType.valueOf(f2.getString("guntype"))
++						: WeaponType.valueOf(f2.getString("weapontype"));
++				final ItemStack[] materails = main.convertIngredients(f2.getStringList("craftingRequirements"));
++
++				final String displayname = f2.contains("displayname")
++						? LocalUtils.colorize(f2.getString("displayname"))
++						: (ChatColor.GOLD + name);
++				final List<String> extraLore2 = f2.contains("lore") ? f2.getStringList("lore") : null;
++				final List<String> extraLore = new ArrayList<String>();
+ 
++				try {
++					for (String lore : extraLore2) {
++						extraLore.add(LocalUtils.colorize(lore));
++					}
++				} catch (Error | Exception re52) {
+ 				}
++				if (weatype.isGun()) {
++					Gun g = new Gun(name, ms);
++					g.setDisplayname(displayname);
++					g.setCustomLore(extraLore);
++					g.setIngredients(materails);
++					QAMain.gunRegister.put(ms, g);
++					loadGunSettings(g, f2);
++				}
++
+ 			}
++		}
+ 
+ 	}
+ 
+@@ -337,7 +339,7 @@ public class GunYMLLoader {
+ 		if (f2.contains("maxbullets"))
+ 			g.setMaxBullets(f2.getInt("maxbullets"));
+ 		if (f2.contains("damage"))
+-			g.setDurabilityDamage(f2.getInt("damage"));
++			g.setDurabilityDamage(f2.getDouble("damage"));
+ 		if (f2.contains("durability"))
+ 			g.setDuribility(f2.getInt("durability"));
+ 		if (f2.contains("price"))
+@@ -429,7 +431,7 @@ public class GunYMLLoader {
+ 		if (f2.contains("recoil"))
+ 			g.setRecoil(f2.getDouble("recoil"));
+ 		if (f2.contains("visualRecoil"))
+-			g.setRecoil(f2.getDouble("visualRecoil"));
++			g.setVisualRecoil(f2.getDouble("visualRecoil"));
+ 		if (f2.contains("headshotMultiplier"))
+ 			g.setHeadshotMultiplier(f2.getDouble("headshotMultiplier"));
+ 		if (f2.contains("unlimitedAmmo"))
+@@ -440,13 +442,13 @@ public class GunYMLLoader {
+ 			g.setFireRate(f2.getInt("firerate"));
+ 		if (f2.contains("ReloadingHandler")) {
+ 			g.setReloadingHandler(ReloadingManager.getHandler(f2.getString("ReloadingHandler")));
+-			if(g.getReloadingingHandler()!=null){
++			if (g.getReloadingingHandler() != null) {
+ 				g.setReloadingSound(g.getReloadingingHandler().getDefaultReloadingSound());
+ 			}
+ 		}
+ 		if (f2.contains("ChargingHandler") && !f2.getString("ChargingHandler").equals("none")) {
+ 			g.setChargingHandler(ChargingManager.getHandler(f2.getString("ChargingHandler")));
+-			if(g.getChargingHandler()!=null){
++			if (g.getChargingHandler() != null) {
+ 				g.setChargingSound(g.getChargingHandler().getDefaultChargingSound());
+ 			}
+ 		}
+@@ -464,17 +466,31 @@ public class GunYMLLoader {
+ 			g.setIsPrimary(f2.getBoolean("isPrimaryWeapon"));
+ 		if (f2.contains("setZoomLevel"))
+ 			g.setZoomLevel(f2.getInt("setZoomLevel"));
+-		if(f2.contains("firing_knockback"))
++		if (f2.contains("firing_knockback"))
+ 			g.setKnockbackPower(f2.getDouble("firing_knockback"));
+-		if(f2.contains("slownessOnEquip"))
++		if (f2.contains("slownessOnEquip"))
+ 			g.setSlownessPower(f2.getInt("slownessOnEquip"));
+-		if(f2.contains("weaponsounds_reloadingSound"))
++		if (f2.contains("weaponsounds_reloadingSound"))
+ 			g.setReloadingSound(f2.getString("weaponsounds_reloadingSound"));
+-		if(f2.contains("weaponsounds_chargingSound"))
++		if (f2.contains("weaponsounds_chargingSound"))
+ 			g.setChargingSound(f2.getString("weaponsounds_chargingSound"));
+-		if(f2.contains("maxItemStack"))
++		if (f2.contains("maxItemStack"))
+ 			g.setMaxItemStack(f2.getInt("maxItemStack"));
+ 
++		if (f2.contains("bulletSpread"))
++			g.setBulletSpread(f2.getDouble("bulletSpread"));
++
++		if (f2.contains("diamond_damage"))
++			g.setDiamondDamage(f2.getDouble("diamond_damage"));
++		if (f2.contains("golden_damage"))
++			g.setGoldenDamage(f2.getDouble("golden_damage"));
++
++		if (f2.contains("headshot_damage"))
++			g.setHeadshotDamage(f2.getDouble("headshot_damage"));
++		if (f2.contains("diamond_headshot_damage"))
++			g.setDiamondHeadshotDamage(f2.getDouble("diamond_headshot_damage"));
++		if (f2.contains("golden_headshot_damage"))
++			g.setGoldenHeadshotDamage(f2.getDouble("golden_headshot_damage"));
+ 
+ 		if (f2.contains("particles.bullet_particle") || f2.contains("particles.bullet_particleR")) {
+ 			try {
+@@ -501,8 +517,8 @@ public class GunYMLLoader {
+ 				loadGuns(main, f);
+ 				items++;
+ 			}
+-			if(!QAMain.verboseLoadingLogging)
+-				main.getLogger().info("-Loaded "+items+" Gun types.");
++			if (!QAMain.verboseLoadingLogging)
++				main.getLogger().info("-Loaded " + items + " Gun types.");
+ 		}
+ 	}
+ 
+@@ -517,7 +533,7 @@ public class GunYMLLoader {
+ 							final String name = f2.getString("name");
+ 							main.getLogger().info("-Loading Attachment: " + name);
+ 							final String displayname = f2.contains("displayname")
+-									? LocalUtils.colorize( f2.getString("displayname"))
++									? LocalUtils.colorize(f2.getString("displayname"))
+ 									: (ChatColor.GOLD + name);
+ 							final List<String> extraLore2 = f2.contains("lore") ? f2.getStringList("lore") : null;
+ 
+@@ -539,12 +555,13 @@ public class GunYMLLoader {
+ 							final List<String> extraLore = new ArrayList<String>();
+ 							try {
+ 								for (String lore : extraLore2) {
+-									extraLore.add(LocalUtils.colorize( lore));
++									extraLore.add(LocalUtils.colorize(lore));
+ 								}
+ 							} catch (Error | Exception re52) {
+ 							}
+-							if(baseGunM==null){
+-								main.getLogger().info("--Failed to load "+name+" attachment because the base \""+base+"\" does not exist.");
++							if (baseGunM == null) {
++								main.getLogger().info("--Failed to load " + name + " attachment because the base \""
++										+ base + "\" does not exist.");
+ 								continue;
+ 							}
+ 
+@@ -567,8 +584,8 @@ public class GunYMLLoader {
+ 					e.printStackTrace();
+ 				}
+ 			}
+-			if(!QAMain.verboseLoadingLogging)
+-				main.getLogger().info("-Loaded "+items+" Attachment types.");
++			if (!QAMain.verboseLoadingLogging)
++				main.getLogger().info("-Loaded " + items + " Attachment types.");
+ 		}
+ 	}
+ 
+@@ -576,7 +593,8 @@ public class GunYMLLoader {
+ 		List<Material> materials = new ArrayList<>();
+ 
+ 		for (String s : list) {
+-			if (s.equals("MATERIAL_NAME_HERE")) continue;
++			if (s.equals("MATERIAL_NAME_HERE"))
++				continue;
+ 
+ 			try {
+ 				Material material = Material.getMaterial(s.toUpperCase());
+diff --git a/src/main/java/me/zombie_striker/qg/guns/Gun.java b/src/main/java/me/zombie_striker/qg/guns/Gun.java
+index a3f7499..434e9ce 100644
+--- a/src/main/java/me/zombie_striker/qg/guns/Gun.java
++++ b/src/main/java/me/zombie_striker/qg/guns/Gun.java
+@@ -1,11 +1,13 @@
+ package me.zombie_striker.qg.guns;
+ 
++import com.bekvon.bukkit.residence.commands.current;
+ import com.cryptomorin.xseries.XPotion;
+ import de.tr7zw.changeme.nbtapi.NBT;
+ import me.zombie_striker.customitemmanager.*;
+ import me.zombie_striker.qg.QAMain;
+ import me.zombie_striker.qg.ammo.Ammo;
+ import me.zombie_striker.qg.api.QAWeaponPrepareShootEvent;
++import me.zombie_striker.qg.api.QAWeaponReloadEvent;
+ import me.zombie_striker.qg.api.QualityArmory;
+ import me.zombie_striker.qg.guns.chargers.ChargingHandler;
+ import me.zombie_striker.qg.guns.projectiles.ProjectileManager;
+@@ -32,6 +34,8 @@ import java.util.HashMap;
+ import java.util.List;
+ import java.util.UUID;
+ 
++import static me.zombie_striker.qg.guns.utils.GunUtil.highRecoilCounter;
++
+ public class Gun extends CustomBaseObject implements ArmoryBaseObject, Comparable<Gun> {
+ 
+     private static final String CALCTEXT = ChatColor.DARK_GRAY + "qadata:";
+@@ -46,8 +50,8 @@ public class Gun extends CustomBaseObject implements ArmoryBaseObject, Comparabl
+     RealtimeCalculationProjectile customProjectile = null;
+     double velocity = 2;
+     double explosionRadius = 10;
+-    double recoil = 1;
+-    double visualRecoil = 1.0;
++    double recoil = 0.001;
++    double visualRecoil = 0.06;
+     private WeaponType type;
+     private boolean hasIronSights;
+     private int zoomLevel = 0;
+@@ -56,7 +60,7 @@ public class Gun extends CustomBaseObject implements ArmoryBaseObject, Comparabl
+     private double swaymultiplier = 2;
+     private double swayUnscopedMultiplier = 1;
+     private int maxbull;
+-    private float damage;
++    private double damage;
+     private int durib = 1000;
+     private boolean isAutomatic;
+     private double headshotMultiplier = 2;
+@@ -85,6 +89,13 @@ public class Gun extends CustomBaseObject implements ArmoryBaseObject, Comparabl
+     private double knockbackPower = 0;
+     private int slownessPower = 0;
+     private final List<Material> breakableMaterials = new ArrayList<>();
++    private double diamondDamage = -1;
++    private double goldenDamage = -1;
++    private double headshotDamage = -1;
++    private double diamondHeadshotDamage = -1;
++    private double goldenHeadshotDamage = -1;
++
++    private double bulletSpread = 0.1;
+ 
+     private String reloadingSound = WeaponSounds.RELOAD_MAG_OUT.getSoundName();
+     private String chargingSound = WeaponSounds.RELOAD_BOLT.getSoundName();
+@@ -95,32 +106,32 @@ public class Gun extends CustomBaseObject implements ArmoryBaseObject, Comparabl
+ 
+     @Deprecated
+     public Gun(String name, MaterialStorage id, WeaponType type, boolean h, Ammo am, double acc, double swaymult,
+-               int maxBullets, float damage, boolean isAutomatic, int durib, String ws, double cost,
+-               ItemStack[] ing) {
++            int maxBullets, double damage, boolean isAutomatic, int durib, String ws, double cost,
++            ItemStack[] ing) {
+         this(name, id, type, h, am, acc, swaymult, maxBullets, damage, isAutomatic, durib, ws,
+                 null, ChatColor.GOLD + name, cost, ing);
+     }
+ 
+     @Deprecated
+     public Gun(String name, MaterialStorage id, WeaponType type, boolean h, Ammo am, double acc, double swaymult,
+-               int maxBullets, float damage, boolean isAutomatic, int durib, WeaponSounds ws, double cost,
+-               ItemStack[] ing) {
++            int maxBullets, double damage, boolean isAutomatic, int durib, WeaponSounds ws, double cost,
++            ItemStack[] ing) {
+         this(name, id, type, h, am, acc, swaymult, maxBullets, damage, isAutomatic, durib, ws, null,
+                 ChatColor.GOLD + name, cost, ing);
+     }
+ 
+     @Deprecated
+     public Gun(String name, MaterialStorage id, WeaponType type, boolean h, Ammo am, double acc, double swaymult,
+-               int maxBullets, float damage, boolean isAutomatic, int durib, WeaponSounds ws, List<String> extralore,
+-               String displayname, double cost, ItemStack[] ing) {
++            int maxBullets, double damage, boolean isAutomatic, int durib, WeaponSounds ws, List<String> extralore,
++            String displayname, double cost, ItemStack[] ing) {
+         this(name, id, type, h, am, acc, swaymult, maxBullets, damage, isAutomatic, durib, ws.getSoundName(),
+                 extralore, displayname, cost, ing);
+     }
+ 
+     @Deprecated
+     public Gun(String name, MaterialStorage id, WeaponType type, boolean h, Ammo am, double acc, double swaymult,
+-               int maxBullets, float damage, boolean isAutomatic, int durib, String ws, List<String> extralore,
+-               String displayname, double cost, ItemStack[] ing) {
++            int maxBullets, double damage, boolean isAutomatic, int durib, String ws, List<String> extralore,
++            String displayname, double cost, ItemStack[] ing) {
+         super(name, id, LocalUtils.colorize(displayname), extralore, true);
+         this.type = type;
+         this.hasIronSights = h;
+@@ -137,8 +148,8 @@ public class Gun extends CustomBaseObject implements ArmoryBaseObject, Comparabl
+ 
+         this.setPrice(cost);
+ 
+-        //this.extralore = extralore;
+-        //this.displayname = LocalUtils.colorize(displayname);
++        // this.extralore = extralore;
++        // this.displayname = LocalUtils.colorize(displayname);
+     }
+ 
+     public Gun(String name, MaterialStorage id) {
+@@ -146,7 +157,8 @@ public class Gun extends CustomBaseObject implements ArmoryBaseObject, Comparabl
+     }
+ 
+     @SuppressWarnings("deprecation")
+-    public static boolean USE_THIS_INSTEAD_OF_INDEVIDUAL_SHOOT_METHODS(Gun g, Player player, double acc, boolean holdingRMB) {
++    public static boolean USE_THIS_INSTEAD_OF_INDEVIDUAL_SHOOT_METHODS(Gun g, Player player, double acc,
++            boolean holdingRMB) {
+         boolean offhand = QualityArmory.isIronSights(player.getInventory().getItemInHand());
+         if ((!offhand && getAmount(player) > 0)
+                 || (offhand && Update19OffhandChecker.hasAmountOFfhandGreaterthan(player, 0))) {
+@@ -165,7 +177,8 @@ public class Gun extends CustomBaseObject implements ArmoryBaseObject, Comparabl
+     }
+ 
+     public static int getAmount(ItemStack is) {
+-        if (is.getType().equals(Material.AIR)) return 0;
++        if (is.getType().equals(Material.AIR))
++            return 0;
+ 
+         return NBT.get(is, nbt -> nbt.hasTag("ammo") ? nbt.getInteger("ammo") : 0);
+     }
+@@ -181,10 +194,12 @@ public class Gun extends CustomBaseObject implements ArmoryBaseObject, Comparabl
+     public static void updateAmmoLore(Gun g, ItemStack current, int amount) {
+         if (QAMain.SHOW_BULLETS_LORE && g != null) {
+             ItemMeta meta = current.getItemMeta();
+-            if (meta == null || !meta.hasLore()) return;
++            if (meta == null || !meta.hasLore())
++                return;
+ 
+             List<String> lore = meta.getLore();
+-            if (lore == null) return;
++            if (lore == null)
++                return;
+ 
+             for (int i = 0; i < lore.size(); i++) {
+                 String loreLine = lore.get(i);
+@@ -202,7 +217,8 @@ public class Gun extends CustomBaseObject implements ArmoryBaseObject, Comparabl
+     public static void updateAmmo(Gun g, Player player, int amount) {
+         ItemStack current = player.getInventory().getItemInHand();
+ 
+-        if (g == null) g = QualityArmory.getGun(current);
++        if (g == null)
++            g = QualityArmory.getGun(current);
+         updateAmmo(g, current, amount);
+ 
+         if (QAMain.showAmmoInXPBar)
+@@ -210,54 +226,26 @@ public class Gun extends CustomBaseObject implements ArmoryBaseObject, Comparabl
+     }
+ 
+     public static List<String> getGunLore(Gun g, ItemStack current, int amount) {
+-        List<String> lore = (current != null && current.hasItemMeta() && current.getItemMeta().hasLore()) ? current.getItemMeta().getLore() : new ArrayList<>();
++        List<String> lore = new ArrayList<>();
++
++        // Add variant data (needed for weapon functionality, but hidden from display)
+         OLD_ItemFact.addVariantData(null, lore, g);
+-        if (QAMain.ENABLE_LORE_INFO) {
+-            if (QAMain.SHOW_BULLETS_LORE) lore.add(QAMain.S_ITEM_BULLETS + ": " + amount + "/" + g.getMaxBullets());
+-            lore.add(QAMain.S_ITEM_DAMAGE + ": " + g.getDamage());
+-            lore.add(QAMain.S_ITEM_DPS + ": "
+-                    + (g.isAutomatic()
+-                    ? (2 * g.getFireRate() * g.getDamage()) + ""
+-                    + (g.getBulletsPerShot() > 1 ? "x" + g.getBulletsPerShot() : "")
+-                    : "" + ((int) (1.0 / g.getDelayBetweenShotsInSeconds()) * g.getDamage())
+-                    + (g.getBulletsPerShot() > 1 ? "x" + g.getBulletsPerShot() : "")));
+-            if (g.getAmmoType() != null)
+-                lore.add(QAMain.S_ITEM_AMMO + ": " + g.getAmmoType().getDisplayName());
+-        }
+-        if (QAMain.AutoDetectResourcepackVersion && Bukkit.getPluginManager().isPluginEnabled("ViaRewind")) {
+-            if (g.is18Support()) {
+-                lore.add(ChatColor.GRAY + "1.8 Weapon");
+-            }
+-        }
+ 
+-        if (QAMain.enableDurability)
+-            if (current == null) {
+-                double k = ((double) g.getDamage()) / g.getDurability();
+-                ChatColor c = k > 0.5 ? ChatColor.DARK_GREEN : k > 0.25 ? ChatColor.GOLD : ChatColor.DARK_RED;
+-                lore.add(c + QAMain.S_ITEM_DURIB + ":" + g.getDurability() + "/" + g.getDurability());
+-            } else {
+-                lore = setDurabilityDamage(g, lore, getDamage(current));
+-            }
+-        if (QAMain.ENABLE_LORE_HELP) {
+-            if (g.isAutomatic()) {
+-                lore.add(QAMain.S_LMB_SINGLE);
+-                lore.add(QAMain.S_LMB_FULLAUTO);
+-                lore.add(QAMain.S_RMB_RELOAD);
+-            } else {
+-                lore.add(QAMain.S_LMB_SINGLE);
+-                lore.add(QAMain.enableIronSightsON_RIGHT_CLICK ? QAMain.S_RMB_R1 : QAMain.S_RMB_R2);
+-                if (g.hasIronSights())
+-                    lore.add(QAMain.enableIronSightsON_RIGHT_CLICK ? QAMain.S_RMB_A1 : QAMain.S_RMB_A2);
+-            }
++        // Only add bullets information if enabled
++        if (QAMain.SHOW_BULLETS_LORE) {
++            lore.add(QAMain.S_ITEM_BULLETS + ": " + amount + "/" + g.getMaxBullets());
+         }
+ 
+-        if (current != null && current.hasItemMeta() && current.getItemMeta().hasLore())
++        // Preserve UUID if present
++        if (current != null && current.hasItemMeta() && current.getItemMeta().hasLore()) {
+             for (String s : current.getItemMeta().getLore()) {
+                 if (ChatColor.stripColor(s).contains("UUID")) {
+                     lore.add(s);
+                     break;
+                 }
+             }
++        }
++
+         return lore;
+     }
+ 
+@@ -399,7 +387,8 @@ public class Gun extends CustomBaseObject implements ArmoryBaseObject, Comparabl
+         this.customProjectile = g.customProjectile;
+         this.velocity = g.velocity;
+         this.recoil = g.recoil;
+-        this.visualRecoil= g.visualRecoil;
++        this.visualRecoil = g.visualRecoil;
++        this.bulletSpread = g.bulletSpread;
+     }
+ 
+     public void setHasIronsights(boolean b) {
+@@ -445,7 +434,9 @@ public class Gun extends CustomBaseObject implements ArmoryBaseObject, Comparabl
+         return recoil;
+     }
+ 
+-    public double getVisualRecoil() { return visualRecoil;}
++    public double getVisualRecoil() {
++        return visualRecoil;
++    }
+ 
+     public void setRecoil(double d) {
+         this.recoil = d;
+@@ -527,6 +518,14 @@ public class Gun extends CustomBaseObject implements ArmoryBaseObject, Comparabl
+         this.shotsPerBullet = i;
+     }
+ 
++    public double getBulletSpread() {
++        return bulletSpread;
++    }
++
++    public void setBulletSpread(double bulletSpread) {
++        this.bulletSpread = bulletSpread;
++    }
++
+     public void setZoomLevel(int zoom) {
+         this.zoomLevel = zoom;
+     }
+@@ -615,16 +614,28 @@ public class Gun extends CustomBaseObject implements ArmoryBaseObject, Comparabl
+     }
+ 
+     public void reload(Player player) {
+-        if (getChargingHandler() == null || (getReloadingingHandler() == null || !getReloadingingHandler().isReloading(player)))
++        // 1´©ÅÔâú SEMPRE crea e chiama l'evento (PRIMA di qualsiasi controllo)
++        QAWeaponReloadEvent event = new QAWeaponReloadEvent(player, this);
++        Bukkit.getPluginManager().callEvent(event);
++
++        // 2´©ÅÔâú Se l'evento ├¿ cancellato, STOP
++        if (event.isCancelled()) {
++            return;
++        }
++
++        // 3´©ÅÔâú Ora fai i controlli originali
++        if (getChargingHandler() == null
++                || (getReloadingingHandler() == null || !getReloadingingHandler().isReloading(player))) {
++            // 4´©ÅÔâú Reload reale (chiamata originale)
+             GunUtil.basicReload(this, player, hasUnlimitedAmmo(), reloadTime);
++        }
+     }
+ 
+     public double getDamage() {
+         return damage;
+     }
+ 
+-
+-    public void setDurabilityDamage(float damage) {
++    public void setDurabilityDamage(double damage) {
+         this.damage = damage;
+     }
+ 
+@@ -632,7 +643,6 @@ public class Gun extends CustomBaseObject implements ArmoryBaseObject, Comparabl
+         return this.durib;
+     }
+ 
+-
+     public void setSwayUnscopedMultiplier(double swaymultiplier) {
+         this.swayUnscopedMultiplier = swaymultiplier;
+     }
+@@ -804,9 +814,11 @@ public class Gun extends CustomBaseObject implements ArmoryBaseObject, Comparabl
+             shooter.getWorld().playSound(shooter.getLocation(), getSoundOnEquip(), 1, 1);
+         if (getSlownessPower() > 0) {
+             if (shooter.hasPotionEffect(XPotion.SLOWNESS.getPotionEffectType()))
+-                if (shooter.getPotionEffect(XPotion.SLOWNESS.getPotionEffectType()).getAmplifier() != getSlownessPower())
++                if (shooter.getPotionEffect(XPotion.SLOWNESS.getPotionEffectType())
++                        .getAmplifier() != getSlownessPower())
+                     shooter.removePotionEffect(XPotion.SLOWNESS.getPotionEffectType());
+-            shooter.addPotionEffect(new PotionEffect(XPotion.SLOWNESS.getPotionEffectType(), Integer.MAX_VALUE, getSlownessPower()));
++            shooter.addPotionEffect(
++                    new PotionEffect(XPotion.SLOWNESS.getPotionEffectType(), Integer.MAX_VALUE, getSlownessPower()));
+         }
+         return false;
+     }
+@@ -815,7 +827,8 @@ public class Gun extends CustomBaseObject implements ArmoryBaseObject, Comparabl
+     public boolean onSwapAway(Player shooter, ItemStack usedItem) {
+         if (getSlownessPower() > 0) {
+             if (shooter.hasPotionEffect(XPotion.SLOWNESS.getPotionEffectType()))
+-                if (shooter.getPotionEffect(XPotion.SLOWNESS.getPotionEffectType()).getAmplifier() == getSlownessPower())
++                if (shooter.getPotionEffect(XPotion.SLOWNESS.getPotionEffectType())
++                        .getAmplifier() == getSlownessPower())
+                     shooter.removePotionEffect(XPotion.SLOWNESS.getPotionEffectType());
+         }
+         return false;
+@@ -855,7 +868,7 @@ public class Gun extends CustomBaseObject implements ArmoryBaseObject, Comparabl
+                 Block b = player.getTargetBlock(null, 6);
+                 if (b != null
+                         && (b.getType() == Material.CHEST
+-                        || b.getType() == Material.TRAPPED_CHEST)
++                                || b.getType() == Material.TRAPPED_CHEST)
+                         || b.getType() == Material.ENDER_CHEST) {
+                     QAMain.DEBUG("Chest interactable check has return true!");
+                     return true;
+@@ -866,7 +879,8 @@ public class Gun extends CustomBaseObject implements ArmoryBaseObject, Comparabl
+ 
+         if (fire) {
+             QAMain.DEBUG("Fire mode called");
+-            if (player.getPlayer().getItemInHand().getItemMeta().getDisplayName().contains(QAMain.S_RELOADING_MESSAGE)) {
++            if (player.getPlayer().getItemInHand().getItemMeta().getDisplayName()
++                    .contains(QAMain.S_RELOADING_MESSAGE)) {
+                 if (!GunRefillerRunnable.hasItemReloaded(player, usedItem)) {
+                     ItemStack tempused = usedItem;
+                     ItemMeta im = tempused.getItemMeta();
+@@ -894,19 +908,11 @@ public class Gun extends CustomBaseObject implements ArmoryBaseObject, Comparabl
+                             offhand = false;
+                         }
+                         if (QAMain.allowGunReload) {
+-                            QualityArmory.sendHotbarGunAmmoCount(player.getPlayer(), this, usedItem, ((getMaxBullets() != getAmount(player))
+-                                    && GunUtil.hasAmmo(player.getPlayer(), this)));
+-                            if ((getMaxBullets() != getAmount(player))) {
+-                                QAMain.DEBUG("Ammo full");
+-                            } else if (playerHasAmmo(player.getPlayer())) {
+-                                QAMain.DEBUG("Trying to reload WITH AUTORELOAD. player has ammo");
+-                                reload(player.getPlayer());
+-                            } else {
+-                                if (QAMain.showOutOfAmmoOnItem) {
+-                                    QAMain.DEBUG("UNSUPPORTED: Out of ammo displayed on item");
+-                                }
+-                                QAMain.DEBUG("Trying to reload WITH AUTORELOAD. player DOES NOT have ammo");
+-                            }
++                            QualityArmory.sendHotbarGunAmmoCount(player.getPlayer(), this, usedItem,
++                                    ((getMaxBullets() != getAmount(player))
++                                            && GunUtil.hasAmmo(player.getPlayer(), this)));
++                            // Ô£à MODIFICA 1: Rimuovi il controllo if/else e chiama sempre reload()
++                            reload(player.getPlayer());
+                         }
+                         return true;
+                     }
+@@ -931,13 +937,8 @@ public class Gun extends CustomBaseObject implements ArmoryBaseObject, Comparabl
+                             QualityArmory.sendHotbarGunAmmoCount(player.getPlayer(), this, usedItem,
+                                     ((getMaxBullets() != getAmount(player))
+                                             && GunUtil.hasAmmo(player.getPlayer(), this)));
+-                            if (playerHasAmmo(player.getPlayer())) {
+-                                QAMain.DEBUG("Trying to reload WITH AUTORELOAD. player has ammo");
+-                                reload(player.getPlayer());
+-
+-                            } else {
+-                                QAMain.DEBUG("Trying to reload WITH AUTORELOAD. player DOES NOT have ammo");
+-                            }
++                            // Ô£à MODIFICA 2: Rimuovi il controllo if/else e chiama sempre reload()
++                            reload(player.getPlayer());
+                         }
+                     }
+                     return true;
+@@ -952,24 +953,19 @@ public class Gun extends CustomBaseObject implements ArmoryBaseObject, Comparabl
+                         }
+                         lastRMB.put(player.getUniqueId(), System.currentTimeMillis());
+                     }
+-                    if (!GunUtil.isDelay(this, player) && recoil > 0) { // controllo se la variabile recoil ├¿ >0
++                    if (!GunUtil.isDelay(this, player) && recoil > 0) {
+                         Vector push = player.getLocation()
+                                 .getDirection()
+                                 .normalize()
+-                                .multiply(-recoil / 100); // negativo per spinta allÔÇÖindietro
+-
+-                        push.setY(0); // niente spinta verticale
+-                        player.setVelocity(player.getVelocity().add(push));
+-                    }
+-                    if (!GunUtil.isDelay(this, player) && getVisualRecoil() != 0) {
+-                        Vector currentVelocity = player.getVelocity();
+-                        //currentVelocity.add(player.getLocation().getDirection().normalize().multiply(-getVisualRecoil()));
+-                        player.setVelocity(currentVelocity);
++                                .multiply(-recoil / 10);
++                        push.setY(0);
++                        player.setVelocity(push);
+                     }
+ 
+                     QAMain.DEBUG("" + shoot(player.getPlayer(), automaticfiring));
+                 } else {
+-                    player.getPlayer().playSound(player.getPlayer().getLocation(), WeaponSounds.METALHIT.getSoundName(), 1, 1);
++                    player.getPlayer().playSound(player.getPlayer().getLocation(), WeaponSounds.METALHIT.getSoundName(),
++                            1, 1);
+                     QAMain.DEBUG("Durablility less than 0");
+                 }
+             }
+@@ -980,14 +976,12 @@ public class Gun extends CustomBaseObject implements ArmoryBaseObject, Comparabl
+         } else {
+             QAMain.DEBUG("Non-Fire mode activated");
+ 
+-
+             if (QAMain.enableIronSightsON_RIGHT_CLICK) {
+                 if (!Update19OffhandChecker.supportOffhand(player.getPlayer())) {
+                     QAMain.enableIronSightsON_RIGHT_CLICK = false;
+                     QAMain.DEBUG("Offhand checker returned false for the player. Disabling ironsights");
+                     return true;
+                 }
+-                // Rest should be okay
+                 if (hasIronSights()) {
+                     try {
+ 
+@@ -1028,7 +1022,7 @@ public class Gun extends CustomBaseObject implements ArmoryBaseObject, Comparabl
+                                 Gun g = null;
+                                 if (!QualityArmory.isIronSights(player.getPlayer().getItemInHand())
+                                         || (g = QualityArmory.getGun(
+-                                        Update19OffhandChecker.getItemStackOFfhand(player.getPlayer()))) == null
++                                                Update19OffhandChecker.getItemStackOFfhand(player.getPlayer()))) == null
+                                         || g != checkTo) {
+                                     QAMain.toggleNightvision(player.getPlayer(), checkTo, false);
+                                     QAMain.DEBUG(
+@@ -1036,7 +1030,7 @@ public class Gun extends CustomBaseObject implements ArmoryBaseObject, Comparabl
+                                                     + (!QualityArmory.isIronSights(player.getPlayer().getItemInHand()))
+                                                     + " "
+                                                     + ((g = QualityArmory.getGun(Update19OffhandChecker
+-                                                    .getItemStackOFfhand(player.getPlayer()))) == null)
++                                                            .getItemStackOFfhand(player.getPlayer()))) == null)
+                                                     + " " + (g != checkTo));
+                                     cancel();
+                                     return;
+@@ -1045,7 +1039,6 @@ public class Gun extends CustomBaseObject implements ArmoryBaseObject, Comparabl
+                             }
+                         }.runTaskTimer(QAMain.getInstance(), 20, 20);
+ 
+-
+                         QualityArmory.sendHotbarGunAmmoCount(player.getPlayer(), this, usedItem, false);
+                     } catch (Error e2) {
+                         Bukkit.broadcastMessage(QAMain.prefix
+@@ -1065,12 +1058,8 @@ public class Gun extends CustomBaseObject implements ArmoryBaseObject, Comparabl
+                         QualityArmory.sendHotbarGunAmmoCount(player.getPlayer(), this, usedItem,
+                                 ((getMaxBullets() != getAmount(player))
+                                         && GunUtil.hasAmmo(player.getPlayer(), this)));
+-                        if (playerHasAmmo(player.getPlayer())) {
+-                            QAMain.DEBUG("Trying to reload. player has ammo");
+-                            reload(player.getPlayer());
+-                        } else {
+-                            QAMain.DEBUG("Trying to reload. player DOES NOT have ammo");
+-                        }
++                        // Ô£à MODIFICA 3: Rimuovi il controllo if/else e chiama sempre reload()
++                        reload(player.getPlayer());
+                     } else {
+                         QAMain.DEBUG("Reloading has been disabled");
+                     }
+@@ -1085,7 +1074,8 @@ public class Gun extends CustomBaseObject implements ArmoryBaseObject, Comparabl
+     public void damageDurability(Player player) {
+         if (QAMain.enableDurability) {
+             if (QualityArmory.isIronSights(player.getItemInHand())) {
+-                Update19OffhandChecker.setOffhand(player, durabilityDamage(this, Update19OffhandChecker.getItemStackOFfhand(player)));
++                Update19OffhandChecker.setOffhand(player,
++                        durabilityDamage(this, Update19OffhandChecker.getItemStackOFfhand(player)));
+             } else {
+                 player.setItemInHand(durabilityDamage(this, player.getItemInHand()));
+             }
+@@ -1094,7 +1084,8 @@ public class Gun extends CustomBaseObject implements ArmoryBaseObject, Comparabl
+ 
+     @Override
+     public ItemStack getItemStack() {
+-        return CustomItemManager.getItemType("gun").getItem(this.getItemData().getMat(), this.getItemData().getData(), this.getItemData().getVariant());
++        return CustomItemManager.getItemType("gun").getItem(this.getItemData().getMat(), this.getItemData().getData(),
++                this.getItemData().getVariant());
+     }
+ 
+     public boolean isEnableSwaySneakModifier() {
+@@ -1163,6 +1154,46 @@ public class Gun extends CustomBaseObject implements ArmoryBaseObject, Comparabl
+         return breakableMaterials;
+     }
+ 
++    public void setDiamondDamage(double diamondDamage) {
++        this.diamondDamage = diamondDamage;
++    }
++
++    public double getDiamondDamage() {
++        return diamondDamage;
++    }
++
++    public void setGoldenDamage(double goldenDamage) {
++        this.goldenDamage = goldenDamage;
++    }
++
++    public double getGoldenDamage() {
++        return goldenDamage;
++    }
++
++    public void setHeadshotDamage(double d) {
++        this.headshotDamage = d;
++    }
++
++    public double getHeadshotDamage() {
++        return headshotDamage;
++    }
++
++    public void setDiamondHeadshotDamage(double d) {
++        this.diamondHeadshotDamage = d;
++    }
++
++    public double getDiamondHeadshotDamage() {
++        return diamondHeadshotDamage;
++    }
++
++    public void setGoldenHeadshotDamage(double d) {
++        this.goldenHeadshotDamage = d;
++    }
++
++    public double getGoldenHeadshotDamage() {
++        return goldenHeadshotDamage;
++    }
++
+     @Override
+     public String toString() {
+         return "Gun{" +
+@@ -1219,4 +1250,4 @@ public class Gun extends CustomBaseObject implements ArmoryBaseObject, Comparabl
+                 ", lastRMB=" + lastRMB +
+                 '}';
+     }
+-}
++}
+\ No newline at end of file
+diff --git a/src/main/java/me/zombie_striker/qg/guns/reloaders/M1GarandReloader.java b/src/main/java/me/zombie_striker/qg/guns/reloaders/M1GarandReloader.java
+index 25c42a8..a4d70b2 100644
+--- a/src/main/java/me/zombie_striker/qg/guns/reloaders/M1GarandReloader.java
++++ b/src/main/java/me/zombie_striker/qg/guns/reloaders/M1GarandReloader.java
+@@ -1,23 +1,27 @@
+ package me.zombie_striker.qg.guns.reloaders;
+ 
+-import me.zombie_striker.qg.QAMain;
+-import me.zombie_striker.qg.guns.Gun;
+-import me.zombie_striker.qg.guns.utils.WeaponSounds;
+-import org.bukkit.entity.Player;
+-import org.bukkit.scheduler.BukkitRunnable;
+-
+ import java.util.ArrayList;
+ import java.util.List;
+ import java.util.UUID;
+ 
+-public class M1GarandReloader implements ReloadingHandler{
++import me.zombie_striker.qg.api.QAWeaponReloadEvent;
++import org.bukkit.Bukkit;
++import org.bukkit.entity.Player;
++import org.bukkit.scheduler.BukkitRunnable;
++
++import me.zombie_striker.qg.QAMain;
++import me.zombie_striker.qg.guns.Gun;
++import me.zombie_striker.qg.guns.utils.WeaponSounds;
++import me.zombie_striker.qg.api.QAWeaponReloadEvent;
+ 
++public class M1GarandReloader implements ReloadingHandler {
+ 
+ 	public M1GarandReloader() {
+ 		ReloadingManager.add(this);
+ 	}
+ 
+ 	List<UUID> timeR = new ArrayList<>();
++
+ 	@Override
+ 	public boolean isReloading(Player player) {
+ 		return timeR.contains(player.getUniqueId());
+@@ -25,15 +29,28 @@ public class M1GarandReloader implements ReloadingHandler{
+ 
+ 	@Override
+ 	public double reload(Player player, Gun g, int amountReloading) {
++
++		QAWeaponReloadEvent event = new QAWeaponReloadEvent(player, g);
++		Bukkit.getPluginManager().callEvent(event);
++		if (event.isCancelled()) {
++			return 0;
++		}
++
+ 		timeR.add(player.getUniqueId());
+-		player.getWorld().playSound(player.getLocation(), WeaponSounds.RELOAD_CLICK.getSoundName(), 1, 1f);
+-			new BukkitRunnable() {
+-				@Override
+-				public void run() {
+-						player.getWorld().playSound(player.getLocation(), g.getReloadingSound(), 1, 1f);
+-						timeR.remove(player.getUniqueId());
+-				}
+-			}.runTaskLater(QAMain.getInstance(), Math.max((int) ((g.getReloadTime()* 20.0) - 10.0),10));
++
++		player.getWorld().playSound(player.getLocation(),
++				WeaponSounds.RELOAD_CLICK.getSoundName(), 1, 1f);
++
++		new BukkitRunnable() {
++			@Override
++			public void run() {
++				player.getWorld().playSound(player.getLocation(),
++						g.getReloadingSound(), 1, 1f);
++				timeR.remove(player.getUniqueId());
++			}
++		}.runTaskLater(QAMain.getInstance(),
++				Math.max((int) ((g.getReloadTime() * 20.0) - 10.0), 10));
++
+ 		return g.getReloadTime();
+ 	}
+ 
+diff --git a/src/main/java/me/zombie_striker/qg/guns/reloaders/PumpactionReloader.java b/src/main/java/me/zombie_striker/qg/guns/reloaders/PumpactionReloader.java
+index 24a7535..2f80cee 100644
+--- a/src/main/java/me/zombie_striker/qg/guns/reloaders/PumpactionReloader.java
++++ b/src/main/java/me/zombie_striker/qg/guns/reloaders/PumpactionReloader.java
+@@ -4,14 +4,17 @@ import java.util.ArrayList;
+ import java.util.List;
+ import java.util.UUID;
+ 
+-import me.zombie_striker.qg.api.QualityArmory;
+-import me.zombie_striker.qg.guns.utils.WeaponSounds;
++import me.zombie_striker.qg.api.QAWeaponReloadEvent;
++import org.bukkit.Bukkit;
+ import org.bukkit.Sound;
+ import org.bukkit.entity.Player;
+ import org.bukkit.scheduler.BukkitRunnable;
+ 
+ import me.zombie_striker.qg.QAMain;
++import me.zombie_striker.qg.api.QualityArmory;
+ import me.zombie_striker.qg.guns.Gun;
++import me.zombie_striker.qg.guns.utils.WeaponSounds;
++import me.zombie_striker.qg.api.QAWeaponReloadEvent;
+ 
+ public class PumpactionReloader implements ReloadingHandler {
+ 
+@@ -28,54 +31,67 @@ public class PumpactionReloader implements ReloadingHandler {
+ 
+ 	@Override
+ 	public double reload(final Player player, Gun g, int amountReloading) {
++
++		QAWeaponReloadEvent event = new QAWeaponReloadEvent(player, g);
++		Bukkit.getPluginManager().callEvent(event);
++		if (event.isCancelled()) {
++			return 0;
++		}
++
+ 		timeR.add(player.getUniqueId());
+-		double time = (g.getReloadTime()) / g.getMaxBullets();
++
++		double time = g.getReloadTime() / g.getMaxBullets();
+ 		double time2 = time * amountReloading;
++
+ 		for (int i = 0; i < amountReloading; i++) {
+-			final boolean k = (i + 1 == amountReloading);
++			final boolean last = (i + 1 == amountReloading);
+ 			final int finalI = i;
++
+ 			new BukkitRunnable() {
+-				int temp = player.getInventory().getHeldItemSlot();
++				int slot = player.getInventory().getHeldItemSlot();
+ 
+ 				@Override
+ 				public void run() {
+-					if(player.getInventory().getHeldItemSlot()!=temp)
++					if (player.getInventory().getHeldItemSlot() != slot)
+ 						return;
+-					QualityArmory.sendHotbarGunAmmoCount(player, g, player.getInventory().getItemInMainHand(), true, g.getMaxBullets()-amountReloading+finalI, g.getMaxBullets());
++
++					QualityArmory.sendHotbarGunAmmoCount(
++							player, g,
++							player.getInventory().getItemInMainHand(),
++							true,
++							g.getMaxBullets() - amountReloading + finalI,
++							g.getMaxBullets()
++					);
+ 
+ 					try {
+-						if (k) {
+-							player.getWorld().playSound(player.getLocation(), g.getReloadingSound(), 5, 4f);
+-							player.getWorld().playSound(player.getLocation(), WeaponSounds.RELOAD_SHOTGUN.getSoundName(), 8, 1.4f);
++						player.getWorld().playSound(player.getLocation(),
++								g.getReloadingSound(), 5, 4f);
++						if (last) {
++							player.getWorld().playSound(player.getLocation(),
++									WeaponSounds.RELOAD_SHOTGUN.getSoundName(), 8, 1.4f);
+ 						}
+-						player.getWorld().playSound(player.getLocation(), g.getReloadingSound(), 5, 4f);
+ 					} catch (Error e) {
+ 						try {
+-							if (k) {
+-								player.getWorld().playSound(player.getLocation(), g.getReloadingSound(), 5,
+-										4f);
+-								player.getWorld().playSound(player.getLocation(), Sound.valueOf("DIG_SAND"), 8, 1.4f);
+-							}
+-							player.getWorld().playSound(player.getLocation(), g.getReloadingSound(), 5, 4f);
+-						} catch (Error | Exception e43) {
+-						}
++							player.getWorld().playSound(player.getLocation(),
++									Sound.valueOf("DIG_SAND"), 8, 1.4f);
++						} catch (Error | Exception ignored) {}
+ 					}
+ 				}
+ 			}.runTaskLater(QAMain.getInstance(), (int) (time * i * 20));
+ 		}
++
+ 		new BukkitRunnable() {
+ 			@Override
+ 			public void run() {
+ 				timeR.remove(player.getUniqueId());
+-
+ 			}
+ 		}.runTaskLater(QAMain.getInstance(), (int) (time2 * 20) + 5);
++
+ 		return time2;
+ 	}
+ 
+ 	@Override
+ 	public String getName() {
+-
+ 		return ReloadingManager.PUMP_ACTION_RELOAD;
+ 	}
+ 
+diff --git a/src/main/java/me/zombie_striker/qg/guns/reloaders/ReloadingManager.java b/src/main/java/me/zombie_striker/qg/guns/reloaders/ReloadingManager.java
+index 855cbf4..0445785 100644
+--- a/src/main/java/me/zombie_striker/qg/guns/reloaders/ReloadingManager.java
++++ b/src/main/java/me/zombie_striker/qg/guns/reloaders/ReloadingManager.java
+@@ -8,7 +8,10 @@ public class ReloadingManager {
+ 	public static final String SINGLE_RELOAD = ("SingleBulletReload");
+ 	public static final String PUMP_ACTION_RELOAD = ("PumpActionReload");
+ 	public static final String SLIDE_RELOAD = ("SlideReload");
+-	public static final String M1GARAND_RELOAD=("M1GarandReload");
++	public static final String M1GARAND_RELOAD= ("M1GarandReload");
++	public static final String MAGAZINE_RELOAD = ("MagazineReload");
++
++	// Nel metodo che registra i reloader (di solito nel costruttore statico o init)
+ 
+ 	public static final HashMap<String, ReloadingHandler> handlers = new HashMap<>();
+ 	
+diff --git a/src/main/java/me/zombie_striker/qg/guns/reloaders/SingleBulletReloader.java b/src/main/java/me/zombie_striker/qg/guns/reloaders/SingleBulletReloader.java
+index 601954e..119c0d8 100644
+--- a/src/main/java/me/zombie_striker/qg/guns/reloaders/SingleBulletReloader.java
++++ b/src/main/java/me/zombie_striker/qg/guns/reloaders/SingleBulletReloader.java
+@@ -4,15 +4,17 @@ import java.util.ArrayList;
+ import java.util.List;
+ import java.util.UUID;
+ 
+-import me.zombie_striker.qg.api.QualityArmory;
++import me.zombie_striker.qg.api.QAWeaponReloadEvent;
++import org.bukkit.Bukkit;
+ import org.bukkit.Sound;
+ import org.bukkit.entity.Player;
+-import org.bukkit.inventory.ItemStack;
+ import org.bukkit.scheduler.BukkitRunnable;
+ 
+ import me.zombie_striker.qg.QAMain;
++import me.zombie_striker.qg.api.QualityArmory;
+ import me.zombie_striker.qg.guns.Gun;
+ import me.zombie_striker.qg.guns.utils.WeaponSounds;
++import me.zombie_striker.qg.api.QAWeaponReloadEvent;
+ 
+ public class SingleBulletReloader implements ReloadingHandler {
+ 
+@@ -29,43 +31,62 @@ public class SingleBulletReloader implements ReloadingHandler {
+ 
+ 	@Override
+ 	public double reload(final Player player, Gun g, int amountReloading) {
++
++		QAWeaponReloadEvent event = new QAWeaponReloadEvent(player, g);
++		Bukkit.getPluginManager().callEvent(event);
++		if (event.isCancelled()) {
++			return 0;
++		}
++
+ 		timeR.add(player.getUniqueId());
+-		double time = (g.getReloadTime()) / g.getMaxBullets();
++
++		double time = g.getReloadTime() / g.getMaxBullets();
+ 		double time2 = time * amountReloading;
++
+ 		for (int i = 0; i < amountReloading; i++) {
+ 			final int finalI = i;
++
+ 			new BukkitRunnable() {
+-				int temp = player.getInventory().getHeldItemSlot();
++				int slot = player.getInventory().getHeldItemSlot();
++
+ 				@Override
+ 				public void run() {
+-					if(player.getInventory().getHeldItemSlot()!=temp)
++					if (player.getInventory().getHeldItemSlot() != slot)
+ 						return;
+-					QualityArmory.sendHotbarGunAmmoCount(player, g, player.getInventory().getItemInMainHand(), true, g.getMaxBullets()-amountReloading+finalI, g.getMaxBullets());
++
++					QualityArmory.sendHotbarGunAmmoCount(
++							player, g,
++							player.getInventory().getItemInMainHand(),
++							true,
++							g.getMaxBullets() - amountReloading + finalI,
++							g.getMaxBullets()
++					);
++
+ 					try {
+-						player.getWorld().playSound(player.getLocation(),g.getReloadingSound(), 1, 1f);
++						player.getWorld().playSound(player.getLocation(),
++								g.getReloadingSound(), 1, 1f);
+ 					} catch (Error e) {
+ 						try {
+-							player.getWorld().playSound(player.getLocation(), Sound.valueOf("PISTON_EXTEND"), 5, 4f);
+-							player.getWorld().playSound(player.getLocation(), Sound.valueOf("DIG_SAND"), 8, 1.4f);
+-						} catch (Error | Exception e43) {
+-						}
++							player.getWorld().playSound(player.getLocation(),
++									Sound.valueOf("PISTON_EXTEND"), 5, 4f);
++						} catch (Error | Exception ignored) {}
+ 					}
+ 				}
+ 			}.runTaskLater(QAMain.getInstance(), (int) (time * i * 20));
+ 		}
++
+ 		new BukkitRunnable() {
+ 			@Override
+ 			public void run() {
+ 				timeR.remove(player.getUniqueId());
+-
+ 			}
+ 		}.runTaskLater(QAMain.getInstance(), (int) (time2 * 20) + 5);
++
+ 		return time2;
+ 	}
+ 
+ 	@Override
+ 	public String getName() {
+-
+ 		return ReloadingManager.SINGLE_RELOAD;
+ 	}
+ 
+diff --git a/src/main/java/me/zombie_striker/qg/guns/reloaders/SlideReloader.java b/src/main/java/me/zombie_striker/qg/guns/reloaders/SlideReloader.java
+index bcee8ff..db9bd89 100644
+--- a/src/main/java/me/zombie_striker/qg/guns/reloaders/SlideReloader.java
++++ b/src/main/java/me/zombie_striker/qg/guns/reloaders/SlideReloader.java
+@@ -1,23 +1,27 @@
+ package me.zombie_striker.qg.guns.reloaders;
+ 
+-import me.zombie_striker.qg.QAMain;
+-import me.zombie_striker.qg.guns.Gun;
+-import me.zombie_striker.qg.guns.utils.WeaponSounds;
+-import org.bukkit.entity.Player;
+-import org.bukkit.scheduler.BukkitRunnable;
+-
+ import java.util.ArrayList;
+ import java.util.List;
+ import java.util.UUID;
+ 
+-public class SlideReloader implements ReloadingHandler{
++import me.zombie_striker.qg.api.QAWeaponReloadEvent;
++import org.bukkit.Bukkit;
++import org.bukkit.entity.Player;
++import org.bukkit.scheduler.BukkitRunnable;
++
++import me.zombie_striker.qg.QAMain;
++import me.zombie_striker.qg.guns.Gun;
++import me.zombie_striker.qg.guns.utils.WeaponSounds;
++import me.zombie_striker.qg.api.QAWeaponReloadEvent;
+ 
++public class SlideReloader implements ReloadingHandler {
+ 
+ 	public SlideReloader() {
+ 		ReloadingManager.add(this);
+ 	}
+ 
+ 	List<UUID> timeR = new ArrayList<>();
++
+ 	@Override
+ 	public boolean isReloading(Player player) {
+ 		return timeR.contains(player.getUniqueId());
+@@ -25,15 +29,38 @@ public class SlideReloader implements ReloadingHandler{
+ 
+ 	@Override
+ 	public double reload(Player player, Gun g, int amountReloading) {
++
++		QAWeaponReloadEvent event = new QAWeaponReloadEvent(player, g);
++		Bukkit.getPluginManager().callEvent(event);
++		if (event.isCancelled()) {
++			return 0;
++		}
++
+ 		timeR.add(player.getUniqueId());
+-		player.getWorld().playSound(player.getLocation(), WeaponSounds.RELOAD_CLICK.getSoundName(), 1, 1f);
+-			new BukkitRunnable() {
+-				@Override
+-				public void run() {
+-						player.getWorld().playSound(player.getLocation(), g.getReloadingSound(), 1, 1f);
+-						timeR.remove(player.getUniqueId());
+-				}
+-			}.runTaskLater(QAMain.getInstance(), Math.max((int) ((g.getReloadTime()* 20.0) - 10.0),10));
++
++		player.getWorld().playSound(
++				player.getLocation(),
++				WeaponSounds.RELOAD_CLICK.getSoundName(),
++				1,
++				1f
++		);
++
++		new BukkitRunnable() {
++			@Override
++			public void run() {
++				player.getWorld().playSound(
++						player.getLocation(),
++						g.getReloadingSound(),
++						1,
++						1f
++				);
++				timeR.remove(player.getUniqueId());
++			}
++		}.runTaskLater(
++				QAMain.getInstance(),
++				Math.max((int) ((g.getReloadTime() * 20.0) - 10.0), 10)
++		);
++
+ 		return g.getReloadTime();
+ 	}
+ 
+diff --git a/src/main/java/me/zombie_striker/qg/guns/utils/GunRefillerRunnable.java b/src/main/java/me/zombie_striker/qg/guns/utils/GunRefillerRunnable.java
+index 1348255..e0eb103 100644
+--- a/src/main/java/me/zombie_striker/qg/guns/utils/GunRefillerRunnable.java
++++ b/src/main/java/me/zombie_striker/qg/guns/utils/GunRefillerRunnable.java
+@@ -3,6 +3,7 @@ package me.zombie_striker.qg.guns.utils;
+ import me.zombie_striker.customitemmanager.OLD_ItemFact;
+ import me.zombie_striker.qg.QAMain;
+ import me.zombie_striker.qg.ammo.Ammo;
++import me.zombie_striker.qg.api.QAWeaponReloadEvent;
+ import me.zombie_striker.qg.api.QualityArmory;
+ import me.zombie_striker.qg.api.WeaponInteractEvent;
+ import me.zombie_striker.qg.guns.Gun;
+@@ -142,10 +143,13 @@ public class GunRefillerRunnable {
+                 }
+ 
+ 
+-                Bukkit.getPluginManager().callEvent(new WeaponInteractEvent(player, g, WeaponInteractEvent.InteractType.RELOAD));
+-                if (!QAMain.reloadingTasks.containsKey(player.getUniqueId())) {
+-                    return;
+-                }
++                Bukkit.getPluginManager().callEvent(
++                        new WeaponInteractEvent(player, g, WeaponInteractEvent.InteractType.RELOAD)
++                );
++
++                Bukkit.getPluginManager().callEvent(
++                        new QAWeaponReloadEvent(player, g)
++                );
+                 List<GunRefillerRunnable> rr = QAMain.reloadingTasks.get(player.getUniqueId());
+                 rr.remove(GunRefillerRunnable.this);
+                 reloadedItem = null;
+diff --git a/src/main/java/me/zombie_striker/qg/guns/utils/GunUtil.java b/src/main/java/me/zombie_striker/qg/guns/utils/GunUtil.java
+index af8f239..4cb2f21 100644
+--- a/src/main/java/me/zombie_striker/qg/guns/utils/GunUtil.java
++++ b/src/main/java/me/zombie_striker/qg/guns/utils/GunUtil.java
+@@ -49,16 +49,18 @@ public class GunUtil {
+ 
+ 	public static void shootHandler(Gun g, Player p, int numberOfBullets) {
+ 		double sway = g.getSway() * AimManager.getSway(g, p.getUniqueId());
++		double totalSpread = sway + (numberOfBullets > 1 ? g.getBulletSpread() : 0);
+ 		if (g.usesCustomProjctiles()) {
+ 			for (int i = 0; i < numberOfBullets; i++) {
+ 				Vector go = p.getLocation().getDirection().normalize();
+-				go.add(new Vector((Math.random() * 2 * sway) - sway, (Math.random() * 2 * sway) - sway,
+-						(Math.random() * 2 * sway) - sway)).normalize();
++				go.add(new Vector((Math.random() * 2 * totalSpread) - totalSpread,
++						(Math.random() * 2 * totalSpread) - totalSpread,
++						(Math.random() * 2 * totalSpread) - totalSpread)).normalize();
+ 				Vector two = go.clone();// .multiply();
+ 				g.getCustomProjectile().spawn(g, p.getEyeLocation(), p, two);
+ 			}
+ 		} else {
+-			shootInstantVector(g, p, sway, g.getDamage(), g.getBulletsPerShot(), g.getMaxDistance());
++			shootInstantVector(g, p, totalSpread, g.getDamage(), g.getBulletsPerShot(), g.getMaxDistance());
+ 		}
+ 	}
+ 
+@@ -94,7 +96,6 @@ public class GunUtil {
+ 
+ 			start.add(p.getVelocity());
+ 
+-
+ 			Vector normalizedDirection = p.getLocation().getDirection().normalize();
+ 			normalizedDirection.add(new Vector((Math.random() * 2 * sway) - sway, (Math.random() * 2 * sway) - sway,
+ 					(Math.random() * 2 * sway) - sway));
+@@ -137,7 +138,8 @@ public class GunUtil {
+ 								QAMain.DEBUG("Prevented shooting a hidden player: " + e.getName());
+ 								continue;
+ 							}
+-						} catch (Error | Exception ignored) {}
++						} catch (Error | Exception ignored) {
++						}
+ 
+ 						if (e instanceof Player) {
+ 							Player player = (Player) e;
+@@ -164,11 +166,12 @@ public class GunUtil {
+ 						double checkDistanceMax = box.maximumCheckingDistance(e);
+ 						double startDistance = Math.max(entityDistance - (checkDistanceMax), 0);
+ 
+-						//Get it somewhere close to the entity
++						// Get it somewhere close to the entity
+ 						if (startDistance > 0)
+ 							bulletLocationTest.add(normalizedDirection.clone().multiply(startDistance));
+ 
+-						for (double testDistance = startDistance; testDistance < entityDistance + (checkDistanceMax); testDistance += step.length()) {
++						for (double testDistance = startDistance; testDistance < entityDistance
++								+ (checkDistanceMax); testDistance += step.length()) {
+ 							bulletLocationTest.add(step);
+ 							if (box.intersects(p, bulletLocationTest, e)) {
+ 								bulletHitLoc = bulletLocationTest;
+@@ -176,7 +179,8 @@ public class GunUtil {
+ 								maxEntityDistanceSquared = entityDistanceSquared;
+ 								hitTarget = e;
+ 								hitBox = box;
+-								//headShot = box.allowsHeadshots() ? box.intersectsHead(bulletLocationTest, e) : false;
++								// headShot = box.allowsHeadshots() ? box.intersectsHead(bulletLocationTest, e)
++								// : false;
+ 								break;
+ 							}
+ 						}
+@@ -185,7 +189,6 @@ public class GunUtil {
+ 			}
+ 			time2 = System.currentTimeMillis();
+ 
+-
+ 			if (hitTarget != null) {
+ 				if (QualityArmory.allowGunsInRegion(hitTarget.getLocation())) {
+ 
+@@ -212,7 +215,8 @@ public class GunUtil {
+ 							if (!QAMain.isVersionHigherThan(1, 9))
+ 								try {
+ 									p.playSound(p.getLocation(), Sound.valueOf("LAVA_POP"), 6, 1);
+-								} catch (Error | Exception ignored) {}
++								} catch (Error | Exception ignored) {
++								}
+ 
+ 						} catch (Error | Exception ignored) {
+ 							p.playSound(p.getLocation(), Sound.valueOf("LAVA_POP"), 1, 1);
+@@ -229,11 +233,12 @@ public class GunUtil {
+ 						}
+ 					}
+ 
+-                    double damageMAX = damage * (bulletProtection ? 0.1 : 1)
+-                            * ((headshot && !negateHeadshot) ? (
+-                            QAMain.HeadshotOneHit && !QAMain.headshotBlacklist.contains(hitTarget.getType())
+-                                    ? 50 * g.getHeadshotMultiplier() : g.getHeadshotMultiplier())
+-                            : 1);
++					double damageMAX = damage * (bulletProtection ? 0.1 : 1)
++							* ((headshot && !negateHeadshot)
++									? (QAMain.HeadshotOneHit && !QAMain.headshotBlacklist.contains(hitTarget.getType())
++											? 50 * g.getHeadshotMultiplier()
++											: g.getHeadshotMultiplier())
++									: 1);
+ 
+ 					QAWeaponDamageEntityEvent shootevent = new QAWeaponDamageEntityEvent(p, g, hitTarget, headshot,
+ 							damage, bulletProtection);
+@@ -252,12 +257,14 @@ public class GunUtil {
+ 									// damage / ( toughness / 4 + 2 ) ) ) / 25 )
+ 									double defensePoints = 0;
+ 									double toughness = 0;
+-									for (ItemStack is : new ItemStack[]{player.getInventory().getHelmet(),
++									for (ItemStack is : new ItemStack[] { player.getInventory().getHelmet(),
+ 											player.getInventory().getChestplate(), player.getInventory().getLeggings(),
+-											player.getInventory().getBoots()}) {
++											player.getInventory().getBoots() }) {
+ 										if (is != null && is.hasItemMeta()) {
+-											Collection<AttributeModifier> attributes = is.getItemMeta().getAttributeModifiers(XAttribute.ARMOR.get());
+-											Collection<AttributeModifier> toughnessAttributes = is.getItemMeta().getAttributeModifiers(XAttribute.ARMOR_TOUGHNESS.get());
++											Collection<AttributeModifier> attributes = is.getItemMeta()
++													.getAttributeModifiers(XAttribute.ARMOR.get());
++											Collection<AttributeModifier> toughnessAttributes = is.getItemMeta()
++													.getAttributeModifiers(XAttribute.ARMOR_TOUGHNESS.get());
+ 
+ 											if (attributes != null && !attributes.isEmpty())
+ 												for (AttributeModifier a : attributes)
+@@ -290,16 +297,16 @@ public class GunUtil {
+ 						if (hitTarget instanceof LivingEntity entityTarget) {
+ 							entityTarget.setNoDamageTicks(0);
+ 							QAMain.DEBUG("Damaging entity " + hitTarget.getName() + " ( "
+-                                         + entityTarget.getHealth() + "/"
+-                                         + entityTarget.getMaxHealth() + " :" + damageMAX + " DAM)");
++									+ entityTarget.getHealth() + "/"
++									+ entityTarget.getMaxHealth() + " :" + damageMAX + " DAM)");
+ 
+-							damageEvent = new QADamageEvent(p, entityTarget, g, damageMAX);
++							damageEvent = new QADamageEvent(p, entityTarget, g, damageMAX, headshot);
+ 							Bukkit.getPluginManager().callEvent(damageEvent);
+ 							if (!damageEvent.isCancelled()) {
+ 								entityTarget.damage(damageEvent.getDamage() > 0.0D ? damageEvent.getDamage() : 1.0E-5D);
+ 							}
+ 						}
+-						if(QAMain.anticheatFix || p.hasMetadata("NPC")) {
++						if (QAMain.anticheatFix || p.hasMetadata("NPC")) {
+ 							if (hitTarget instanceof Damageable) {
+ 								((Damageable) hitTarget).damage(damageMAX);
+ 							} else if (hitTarget instanceof EnderDragon) {
+@@ -307,7 +314,7 @@ public class GunUtil {
+ 							} else if (hitTarget instanceof EnderDragonPart) {
+ 								((EnderDragonPart) hitTarget).damage(damageMAX);
+ 							}
+-						}else {
++						} else {
+ 							if (hitTarget instanceof Damageable) {
+ 								((Damageable) hitTarget).damage(damageMAX, p);
+ 							} else if (hitTarget instanceof EnderDragon) {
+@@ -317,11 +324,12 @@ public class GunUtil {
+ 							}
+ 						}
+ 
+-
+ 						if (hitTarget.getPassenger() instanceof Damageable) {
+-							QAMain.DEBUG("Found a passenger (" + hitTarget.getPassenger().getName() + "). Damaging it.");
++							QAMain.DEBUG(
++									"Found a passenger (" + hitTarget.getPassenger().getName() + "). Damaging it.");
+ 
+-							QAWeaponDamageEntityEvent passengerShoot = new QAWeaponDamageEntityEvent(p, g, hitTarget.getPassenger(), false,
++							QAWeaponDamageEntityEvent passengerShoot = new QAWeaponDamageEntityEvent(p, g,
++									hitTarget.getPassenger(), false,
+ 									damage, bulletProtection);
+ 							Bukkit.getPluginManager().callEvent(passengerShoot);
+ 
+@@ -362,14 +370,17 @@ public class GunUtil {
+ 						Bukkit.getPluginManager().callEvent(blockevent);
+ 						if (!blockevent.isCancelled()) {
+ 							if ((solid || isBreakable(start.getBlock(), start)) && !blocksThatWillPLAYBreak.contains(
+-									new Location(start.getWorld(), start.getBlockX(), start.getBlockY(), start.getBlockZ()))) {
++									new Location(start.getWorld(), start.getBlockX(), start.getBlockY(),
++											start.getBlockZ()))) {
+ 								blocksThatWillPLAYBreak.add(
+-										new Location(start.getWorld(), start.getBlockX(), start.getBlockY(), start.getBlockZ()));
++										new Location(start.getWorld(), start.getBlockX(), start.getBlockY(),
++												start.getBlockZ()));
+ 							}
+ 
+ 							final Block block = start.getBlock();
+ 							final Material type = block.getType();
+-							if ((QAMain.destructableBlocks.contains(type) || g.getBreakableMaterials().contains(type)) && ProtectionHandler.canBreak(start)) {
++							if ((QAMain.destructableBlocks.contains(type) || g.getBreakableMaterials().contains(type))
++									&& ProtectionHandler.canBreak(start)) {
+ 								blocksThatWillBreak.add(block);
+ 							}
+ 						}
+@@ -379,52 +390,55 @@ public class GunUtil {
+ 						}
+ 					}
+ 
+-					/*try {
+-						int control = 3;
+-						if (dist % control == 0) {
+-							List<Player> heard = new ArrayList<>();
+-							for (Player p2 : nonheard) {
+-								if (p2.getLocation().distanceSquared(start) <= (control * control * 4)) {
+-									try {
+-										start.getWorld().playSound(start, Sound.BLOCK_DISPENSER_LAUNCH, 2, 3);
+-									} catch (Error e) {
+-										start.getWorld().playSound(start, Sound.valueOf("SHOOT_ARROW"), 2, 2);
+-									}
+-									heard.add(p2);
+-								}
+-							}
+-							for (Player p3 : heard) {
+-								nonheard.remove(p3);
+-							}
+-						}
+-
+-					} catch (Error | Exception e53) {
+-						if (dist % 30 == 0) {
+-							try {
+-								start.getWorld().playSound(start, Sound.BLOCK_DISPENSER_LAUNCH, 2, 2);
+-								start.getWorld().playSound(start, Sound.BLOCK_FIRE_EXTINGUISH, 2, 2);
+-							} catch (Error e) {
+-								start.getWorld().playSound(start, Sound.valueOf("SHOOT_ARROW"), 2, 2);
+-								start.getWorld().playSound(start, Sound.valueOf("FIRE_IGNITE"), 2, 2);
+-							}
+-						}
+-					}*/
++					/*
++					 * try {
++					 * int control = 3;
++					 * if (dist % control == 0) {
++					 * List<Player> heard = new ArrayList<>();
++					 * for (Player p2 : nonheard) {
++					 * if (p2.getLocation().distanceSquared(start) <= (control * control * 4)) {
++					 * try {
++					 * start.getWorld().playSound(start, Sound.BLOCK_DISPENSER_LAUNCH, 2, 3);
++					 * } catch (Error e) {
++					 * start.getWorld().playSound(start, Sound.valueOf("SHOOT_ARROW"), 2, 2);
++					 * }
++					 * heard.add(p2);
++					 * }
++					 * }
++					 * for (Player p3 : heard) {
++					 * nonheard.remove(p3);
++					 * }
++					 * }
++					 * 
++					 * } catch (Error | Exception e53) {
++					 * if (dist % 30 == 0) {
++					 * try {
++					 * start.getWorld().playSound(start, Sound.BLOCK_DISPENSER_LAUNCH, 2, 2);
++					 * start.getWorld().playSound(start, Sound.BLOCK_FIRE_EXTINGUISH, 2, 2);
++					 * } catch (Error e) {
++					 * start.getWorld().playSound(start, Sound.valueOf("SHOOT_ARROW"), 2, 2);
++					 * start.getWorld().playSound(start, Sound.valueOf("FIRE_IGNITE"), 2, 2);
++					 * }
++					 * }
++					 * }
++					 */
+ 					ParticleHandlers.spawnGunParticles(g, start);
+ 				}
+ 
+ 				final Map<Block, BlockRegenData> regenBlocks = new HashMap<>();
+ 				for (Block l : blocksThatWillBreak) {
+ 					QAMain.DEBUG("Breaking " + l.getX() + " " + l.getY() + " " + l.getZ() + ": " + l.getType());
+-					QAWeaponDamageBlockEvent event = new QAWeaponDamageBlockEvent(p,g,l);
++					QAWeaponDamageBlockEvent event = new QAWeaponDamageBlockEvent(p, g, l);
+ 					Bukkit.getPluginManager().callEvent(event);
+ 					if (!event.isCancelled()) {
+-						if (!l.getType().equals(Material.AIR)) regenBlocks.put(l,new BlockRegenData(l));
++						if (!l.getType().equals(Material.AIR))
++							regenBlocks.put(l, new BlockRegenData(l));
+ 						if (QAMain.regenDestructableBlocksAfter > 0) {
+ 							l.setType(Material.AIR);
+ 						} else {
+ 							l.breakNaturally();
+ 						}
+-						CoreProtectHook.logBreak(l,p);
++						CoreProtectHook.logBreak(l, p);
+ 					}
+ 				}
+ 
+@@ -437,7 +451,7 @@ public class GunUtil {
+ 
+ 							for (Block l : regenBlocks.keySet()) {
+ 								regenBlocks.get(l).place(l.getLocation());
+-								CoreProtectHook.logPlace(l,p);
++								CoreProtectHook.logPlace(l, p);
+ 							}
+ 						}
+ 					}.runTaskLater(QAMain.getInstance(), QAMain.regenDestructableBlocksAfter * 20L);
+@@ -450,12 +464,14 @@ public class GunUtil {
+ 				if (Bukkit.getPluginManager().getPlugin("LightAPI") != null) {
+ 					if (p.getEyeLocation().getBlock().getLightLevel() < g.getLightOnShoot()) {
+ 						final Location loc = p.getEyeLocation().clone();
+-						LightAPI.get().setLightLevel(loc.getWorld().getName(),loc.getBlockX(),loc.getBlockY(),loc.getBlockZ(), g.getLightOnShoot());
++						LightAPI.get().setLightLevel(loc.getWorld().getName(), loc.getBlockX(), loc.getBlockY(),
++								loc.getBlockZ(), g.getLightOnShoot());
+ 						new BukkitRunnable() {
+ 
+ 							@Override
+ 							public void run() {
+-								LightAPI.get().setLightLevel(loc.getWorld().getName(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), 0);
++								LightAPI.get().setLightLevel(loc.getWorld().getName(), loc.getBlockX(), loc.getBlockY(),
++										loc.getBlockZ(), 0);
+ 							}
+ 						}.runTaskLater(QAMain.getInstance(), 3);
+ 					}
+@@ -466,20 +482,20 @@ public class GunUtil {
+ 			// Breaking texture
+ 			if (QAMain.blockBreakTexture)
+ 				for (@SuppressWarnings("unused")
+-						Location l : blocksThatWillPLAYBreak) {
++				Location l : blocksThatWillPLAYBreak) {
+ 					start.getWorld().playSound(start, SoundHandler.getSoundWhenShot(start.getBlock()), 2, 1);
+ 					try {/*
+-					 * for (Player p2 : l.getWorld().getPlayers()) {
+-					 * com.comphenix.protocol.events.PacketContainer packet = new
+-					 * com.comphenix.protocol.events.PacketContainer(
+-					 * com.comphenix.protocol.Packets.Server.BLOCK_BREAK_ANIMATION);
+-					 * packet.getIntegers().write(0, p2.getEntityId());
+-					 * packet.getBlockPositionModifier().write(1, new
+-					 * com.comphenix.protocol.wrappers.BlockPosition(l.getBlockX(), l.getBlockY(),
+-					 * l.getBlockZ())); packet.getBytes().write(2, (byte) 4);
+-					 * com.comphenix.protocol.ProtocolLibrary.getProtocolManager().sendServerPacket(
+-					 * p2, packet); }
+-					 */
++							 * for (Player p2 : l.getWorld().getPlayers()) {
++							 * com.comphenix.protocol.events.PacketContainer packet = new
++							 * com.comphenix.protocol.events.PacketContainer(
++							 * com.comphenix.protocol.Packets.Server.BLOCK_BREAK_ANIMATION);
++							 * packet.getIntegers().write(0, p2.getEntityId());
++							 * packet.getBlockPositionModifier().write(1, new
++							 * com.comphenix.protocol.wrappers.BlockPosition(l.getBlockX(), l.getBlockY(),
++							 * l.getBlockZ())); packet.getBytes().write(2, (byte) 4);
++							 * com.comphenix.protocol.ProtocolLibrary.getProtocolManager().sendServerPacket(
++							 * p2, packet); }
++							 */
+ 					} catch (Error | Exception e4) {
+ 					}
+ 				}
+@@ -497,28 +513,30 @@ public class GunUtil {
+ 	public static void basicShoot(boolean offhand, Gun g, Player player, double acc) {
+ 		basicShoot(offhand, g, player, acc, 1, false);
+ 	}
++
+ 	public static void basicShoot(boolean offhand, Gun g, Player player, double acc, boolean holdingRMB) {
+ 		basicShoot(offhand, g, player, acc, 1, holdingRMB);
+ 	}
+ 
+ 	public static void basicShoot(boolean offhand, final Gun g, final Player player, final double acc, int times) {
+-		basicShoot(offhand,g,player,acc,times,false);
++		basicShoot(offhand, g, player, acc, times, false);
+ 	}
++
+ 	@SuppressWarnings("deprecation")
+-	public static void basicShoot(boolean offhand, final Gun g, final Player player, final double acc, int times, boolean holdingRMB) {
++	public static void basicShoot(boolean offhand, final Gun g, final Player player, final double acc, int times,
++			boolean holdingRMB) {
+ 		QAMain.DEBUG("About to shoot!");
+ 
+ 		if (g.getChargingHandler() != null && (g.getChargingHandler().isCharging(player)
+ 				|| (g.getReloadingingHandler() != null && g.getReloadingingHandler().isReloading(player))))
+ 			return;
+ 
+-		if (isDelay(g,player)) {
++		if (isDelay(g, player)) {
+ 			QAMain.DEBUG("Shooting canceled due to last shot being too soon.");
+ 			return;
+ 		}
+ 		g.getLastShotForGun().put(player.getUniqueId(), System.currentTimeMillis());
+ 
+-
+ 		if (rapidfireshooters.containsKey(player.getUniqueId())) {
+ 			QAMain.DEBUG("Shooting canceled due to rapid fire being enabled.");
+ 			return;
+@@ -540,7 +558,6 @@ public class GunUtil {
+ 			playShoot(g, player);
+ 			if (QAMain.enableRecoil)
+ 				addRecoil(player, g);
+-				addVisualRecoil(player, g);
+ 		}
+ 
+ 		if (g.isAutomatic()) {
+@@ -556,15 +573,17 @@ public class GunUtil {
+ 						return;
+ 					}
+ 
+-					if ((g.getChargingHandler() != null && g.getChargingHandler().isCharging(player)) || GunRefillerRunnable.isReloading(player)) {
++					if ((g.getChargingHandler() != null && g.getChargingHandler().isCharging(player))
++							|| GunRefillerRunnable.isReloading(player)) {
+ 						QAMain.DEBUG("Cancelling rapid fire shoot due to charging or reloading.");
+ 						rapidfireshooters.remove(player.getUniqueId());
+ 						cancel();
+ 						return;
+ 					}
+ 
+-					if(!holdingRMB){
+-						if ((!g.hasIronSights() || !IronsightsHandler.isAiming(player)) && ((player.isSneaking() == QAMain.SwapSneakToSingleFire))) {
++					if (!holdingRMB) {
++						if ((!g.hasIronSights() || !IronsightsHandler.isAiming(player))
++								&& ((player.isSneaking() == QAMain.SwapSneakToSingleFire))) {
+ 							cancel();
+ 							QAMain.DEBUG("Stopping Automatic Firing");
+ 							rapidfireshooters.remove(player.getUniqueId());
+@@ -583,15 +602,16 @@ public class GunUtil {
+ 					}
+ 
+ 					int amount = Gun.getAmount(player);
+-					if(holdingRMB && !QAMain.SWAP_TO_LMB_SHOOT){
+-						if(System.currentTimeMillis()-g.getLastTimeRMB(player) > 310){
++					if (holdingRMB && !QAMain.SWAP_TO_LMB_SHOOT) {
++						if (System.currentTimeMillis() - g.getLastTimeRMB(player) > 310) {
+ 							rapidfireshooters.remove(player.getUniqueId());
+ 							cancel();
+ 							return;
+ 						}
+ 					}
+ 
+-					if (((QAMain.SWAP_TO_LMB_SHOOT && player.isSneaking() == QAMain.SwapSneakToSingleFire)) || slotUsed != player.getInventory().getHeldItemSlot() || amount <= 0) {
++					if (((QAMain.SWAP_TO_LMB_SHOOT && player.isSneaking() == QAMain.SwapSneakToSingleFire))
++							|| slotUsed != player.getInventory().getHeldItemSlot() || amount <= 0) {
+ 						rapidfireshooters.remove(player.getUniqueId());
+ 						cancel();
+ 						return;
+@@ -599,12 +619,14 @@ public class GunUtil {
+ 
+ 					boolean regularshoot = true;
+ 					if (g.getChargingHandler() != null && (!g.getChargingHandler().isCharging(player)
+-							&& (g.getReloadingingHandler() == null || !g.getReloadingingHandler().isReloading(player)))) {
++							&& (g.getReloadingingHandler() == null
++									|| !g.getReloadingingHandler().isReloading(player)))) {
+ 						regularshoot = g.getChargingHandler().shoot(g, player, temp);
+ 						QAMain.DEBUG(
+-								"Charging (rapidfire) shoot debug: " + g.getName() + " = " + (g.getChargingHandler() == null
+-										? "null"
+-										: g.getChargingHandler().getName()));
++								"Charging (rapidfire) shoot debug: " + g.getName() + " = "
++										+ (g.getChargingHandler() == null
++												? "null"
++												: g.getChargingHandler().getName()));
+ 					}
+ 					if (regularshoot) {
+ 						QACustomItemInteractEvent gEvent = new QACustomItemInteractEvent(player, g);
+@@ -620,11 +642,9 @@ public class GunUtil {
+ 						playShoot(g, player);
+ 						if (QAMain.enableRecoil)
+ 							addRecoil(player, g);
+-                            addVisualRecoil(player, g);
+ 						// TODO: recoil
+ 					}
+ 
+-
+ 					amount--;
+ 
+ 					if (amount < 0)
+@@ -637,8 +657,8 @@ public class GunUtil {
+ 						slot = player.getInventory().getHeldItemSlot();
+ 					}
+ 					Gun.updateAmmo(g, player.getItemInHand(), amount);
+-					if(QAMain.showAmmoInXPBar){
+-						updateXPBar(player,g,amount);
++					if (QAMain.showAmmoInXPBar) {
++						updateXPBar(player, g, amount);
+ 					}
+ 
+ 					if (slot == -1) {
+@@ -649,10 +669,12 @@ public class GunUtil {
+ 
+ 								try {
+ 									// Fix to re-implement the "up and down" animation
+-									if (QualityArmory.isIronSights(player.getItemInHand()) && QAMain.SHOW_BULLETS_LORE) {
++									if (QualityArmory.isIronSights(player.getItemInHand())
++											&& QAMain.SHOW_BULLETS_LORE) {
+ 										Gun.updateAmmoLore(g, player.getInventory().getItemInOffHand(), amount);
+ 									}
+-								} catch (Exception | Error ignored) {}
++								} catch (Exception | Error ignored) {
++								}
+ 							} else {
+ 								player.getInventory().setItemInHand(temp);
+ 								QAMain.DEBUG("Set mainhand because ironsights not in main hand");
+@@ -663,7 +685,8 @@ public class GunUtil {
+ 					} else {
+ 						ItemStack tempCheck = player.getInventory().getItem(slot);
+ 						if (QualityArmory.isIronSights(tempCheck)) {
+-							CustomBaseObject tempBase = QualityArmory.getCustomItem(Update19OffhandChecker.getItemStackOFfhand(player));
++							CustomBaseObject tempBase = QualityArmory
++									.getCustomItem(Update19OffhandChecker.getItemStackOFfhand(player));
+ 							if (tempBase != null && tempBase == g) {
+ 								Update19OffhandChecker.setOffhand(player, temp);
+ 							}
+@@ -712,11 +735,13 @@ public class GunUtil {
+ 			if (QualityArmory.isIronSights(player.getItemInHand()) && QAMain.SHOW_BULLETS_LORE) {
+ 				Gun.updateAmmoLore(g, player.getInventory().getItemInOffHand(), amount);
+ 			}
+-		} catch (Exception | Error ignored) {}
++		} catch (Exception | Error ignored) {
++		}
+ 	}
+ 
+ 	public static void updateXPBar(Player player, Gun g, int amount) {
+-		if (g == null || player == null) return;
++		if (g == null || player == null)
++			return;
+ 		player.setLevel(amount);
+ 
+ 		if (amount > 0) {
+@@ -767,7 +792,23 @@ public class GunUtil {
+ 	}
+ 
+ 	public static void basicReload(final Gun g, final Player player, boolean doNotRemoveAmmo) {
+-		basicReload(g, player, doNotRemoveAmmo, 1.5);
++		final ItemStack temp = player.getInventory().getItemInHand();
++		Gun gun = QualityArmory.getGun(temp);
++
++		if (gun == null || !gun.equals(g)) {
++			QAMain.DEBUG("Gun in hand is not the same as the gun to reload. Aborting reload.");
++			return;
++		}
++
++		// ­ƒö┤ EVENTO DI RELOAD (PUNTO CRITICO)
++		QAWeaponReloadEvent event = new QAWeaponReloadEvent(player, g);
++		Bukkit.getPluginManager().callEvent(event);
++
++		// ÔØî Se cancellato ÔåÆ STOP TOTALE
++		if (event.isCancelled()) {
++			QAMain.DEBUG("Reload cancelled by WeaponReloadEvent.");
++			return;
++		}
+ 	}
+ 
+ 	public static void basicReload(final Gun g, final Player player, boolean doNotRemoveAmmo, double seconds) {
+@@ -805,71 +846,54 @@ public class GunUtil {
+ 
+ 			if (g.getReloadingingHandler() != null) {
+ 				seconds = g.getReloadingingHandler().reload(player, g, subtractAmount);
++				if (seconds < 0)
++					return;
+ 			}
+ 			QAMain.toggleNightvision(player, g, false);
+-			//Gun.updateAmmo(g, im, initialAmount);
++			// Gun.updateAmmo(g, im, initialAmount);
+ 			im.setDisplayName(g.getDisplayName() + QAMain.S_RELOADING_MESSAGE);
+ 			temp.setItemMeta(im);
+ 			player.getInventory().setItem(slot, temp);
+ 
+-			if(QAMain.showAmmoInXPBar){
+-				updateXPBar(player,g,0);
++			if (QAMain.showAmmoInXPBar) {
++				updateXPBar(player, g, 0);
+ 			}
+-			new GunRefillerRunnable(player, temp, g, slot, initialAmount, reloadAmount, seconds, ammo, subtractAmount, !doNotRemoveAmmo);
++			new GunRefillerRunnable(player, temp, g, slot, initialAmount, reloadAmount, seconds, ammo, subtractAmount,
++					!doNotRemoveAmmo);
+ 
+ 		}
+ 
+ 	}
+ 
+ 	public static void addRecoil(final Player player, final Gun g) {
+-		if (g.getRecoil() <= 0)
+-			return;
+-
+-		// crea il vettore di spinta indietro
+-		Vector push = player.getLocation().getDirection().normalize().multiply(-g.getRecoil());
+-		push.setY(0); // niente spinta verticale
++		if (g.getRecoil() > 0) {
++			// Physical recoil (push back)
++			Vector push = player.getLocation().getDirection().normalize().multiply(-g.getRecoil());
++			push.setY(0);
++			player.setVelocity(push);
++		}
+ 
+-		player.setVelocity(player.getVelocity().add(push));
+-	}
+-	public static void addVisualRecoil(final Player player, final Gun g) {
+-		if (g.getRecoil() == 0)
+-			return;
+-		if (g.getFireRate() >= 4) {
+-			if (highRecoilCounter.containsKey(player.getUniqueId())) {
+-				highRecoilCounter.put(player.getUniqueId(),
+-						highRecoilCounter.get(player.getUniqueId()) + g.getRecoil() / 100);
+-			} else {
+-				highRecoilCounter.put(player.getUniqueId(), g.getRecoil() / 100);
+-				new BukkitRunnable() {
+-					@Override
+-					public void run() {
+-						if (QAMain.hasProtocolLib && QAMain.isVersionHigherThan(1, 13) && !QAMain.hasViaVersion) {
+-							addRecoilWithProtocolLib(player, g, true);
+-							System.out.println("Fatto con Protocol");
+-						}
+-					}
+-				}.runTaskLater(QAMain.getInstance(), 3);
+-			}
+-		} else {
+-			if (QAMain.hasProtocolLib && QAMain.isVersionHigherThan(1, 13)) {
+-				addRecoilWithProtocolLib(player, g, false);
+-				System.out.println("Fatto con protocol no HIGHRECOIL");
+-			}
++		if (g.getVisualRecoil() > 0) {
++			// Visual recoil (yaw/pitch change)
++			addRecoilWithProtocolLib(player, g, highRecoilCounter.containsKey(player.getUniqueId()));
+ 		}
++
++		QAShootEvent event = new QAShootEvent(player, g);
++		Bukkit.getPluginManager().callEvent(event);
+ 	}
+ 
+ 	private static void addRecoilWithProtocolLib(Player player, Gun g, boolean useHighRecoil) {
+-		Vector newDir = player.getLocation().getDirection();
+-		newDir.normalize()
+-				.setY(newDir.getY()
+-						+ ((useHighRecoil ? highRecoilCounter.get(player.getUniqueId()) : g.getRecoil()) / 30))
+-				.multiply(20);
++		Vector newDir = player.getLocation().getDirection().normalize();
++		double recoilValue = useHighRecoil ? highRecoilCounter.get(player.getUniqueId()) : g.getVisualRecoil();
++
++		newDir.setY(newDir.getY() + recoilValue);
++
+ 		if (useHighRecoil)
+ 			highRecoilCounter.remove(player.getUniqueId());
++
+ 		ProtocolLibHandler.sendYawChange(player, newDir);
+ 	}
+ 
+-
+ 	public static boolean isBreakable(Block b, Location l) {
+ 		if (b.getType().name().contains("GLASS"))
+ 			return true;
+@@ -888,13 +912,14 @@ public class GunUtil {
+ 	}
+ 
+ 	public static boolean isDelay(Gun g, Player player) {
+-        if (QAMain.lastWeaponSwitch.containsKey(player.getUniqueId()) &&
+-                System.currentTimeMillis() - QAMain.lastWeaponSwitch.get(player.getUniqueId()) < QAMain.weaponSwitchDelay * 1000)
+-            return true;
++		if (QAMain.lastWeaponSwitch.containsKey(player.getUniqueId()) &&
++				System.currentTimeMillis()
++						- QAMain.lastWeaponSwitch.get(player.getUniqueId()) < QAMain.weaponSwitchDelay * 1000)
++			return true;
+ 
+ 		int showdelay = ((int) (g.getDelayBetweenShotsInSeconds() * 1000));
+ 
+-		 return (g.getLastShotForGun().containsKey(player.getUniqueId())
++		return (g.getLastShotForGun().containsKey(player.getUniqueId())
+ 				&& (System.currentTimeMillis() - g.getLastShotForGun().get(player.getUniqueId()) < showdelay));
+ 	}
+ }
+diff --git a/src/main/java/me/zombie_striker/qg/guns/utils/WeaponSounds.java b/src/main/java/me/zombie_striker/qg/guns/utils/WeaponSounds.java
+index f6f92f7..aa43a8e 100644
+--- a/src/main/java/me/zombie_striker/qg/guns/utils/WeaponSounds.java
++++ b/src/main/java/me/zombie_striker/qg/guns/utils/WeaponSounds.java
+@@ -1,7 +1,7 @@
+ package me.zombie_striker.qg.guns.utils;
+ 
+ public enum WeaponSounds {
+-	GUN_SMALL("bulletsmall"), GUN_MEDIUM("bulletmedium"), GUN_BIG("bulletbig"), GUN_AUTO("bulletauto"), GUN_SMALL_AUTO(
++	GUN_SMALL("weapons.bulletsmall"), GUN_MEDIUM("weapons.bulletmedium"), GUN_BIG("weapons.bullethigh"), GUN_AUTO("bulletauto"), GUN_SMALL_AUTO(
+ 			"bulletsmallauto"),
+ 
+ 	RELOAD_BULLET("reloadbullet"), RELOAD_MAG_IN("reloadmagin"), RELOAD_MAG_OUT("reloadmagout"), RELOAD_BOLT(
+@@ -24,7 +24,7 @@ public enum WeaponSounds {
+ 
+ 	LIGHTSABER_SITH_START("sithsaberstart"),LIGHTSABER_LIGHT_START("lightsaberstart"),LIGHTSABER_HIT("saberhit"),
+ 
+-	RELOAD_MAG_CLICK("reloadmagclick"),	OUT_OF_AMMO_CLICK("outofammoclick"),RELOAD_CLICK("reloadclick"),
++	RELOAD_MAG_CLICK("reloadmagclick"),	OUT_OF_AMMO_CLICK("weapons.empty"),RELOAD_CLICK("reloadclick"),
+ 
+ 	OPENBAG("openbag"),THUMPER("thumper"),PARTY_SHOT("partyshot"),RELOAD_AK47("reloadak47"),RELOAD_SLIDE("reloadslide"),
+ 	GUN_MAUSER("bulletmauser"),GUN_AK47("bulletak47"),RELOAD_FN("reloadfn"),RELOAD_M16("reloadm16"),RELOAD_SHOTGUN("reloadshotgun"),GUN_SHOTGUN("bulletshotgun"),
+diff --git a/src/main/java/me/zombie_striker/qg/handlers/ProtocolLibHandler.java b/src/main/java/me/zombie_striker/qg/handlers/ProtocolLibHandler.java
+index 9c751ef..6840b41 100644
+--- a/src/main/java/me/zombie_striker/qg/handlers/ProtocolLibHandler.java
++++ b/src/main/java/me/zombie_striker/qg/handlers/ProtocolLibHandler.java
+@@ -84,7 +84,8 @@ public class ProtocolLibHandler {
+             protocolManager = ProtocolLibrary.getProtocolManager();
+ 
+         protocolManager.addPacketListener(
+-                new PacketAdapter(QAMain.getInstance(), ListenerPriority.NORMAL, PacketType.Play.Server.ENTITY_EQUIPMENT) {
++                new PacketAdapter(QAMain.getInstance(), ListenerPriority.NORMAL,
++                        PacketType.Play.Server.ENTITY_EQUIPMENT) {
+                     @Override
+                     public void onPacketSending(PacketEvent event) {
+                         QAMain.DEBUG("Processing ENTITY_EQUIPMENT packet");
+@@ -133,15 +134,15 @@ public class ProtocolLibHandler {
+                         } else {
+                             handleLegacyPacketFormat(event, targetPlayer, entityId);
+                         }
+-                   }
++                    }
+ 
+                     /**
+                      * Handle Minecraft 1.16+ packet format
+                      */
+                     private void handleModern1_16PacketFormat(PacketEvent event, Player targetPlayer) {
+                         QAMain.DEBUG("Using Minecraft 1.16+ packet handling");
+-                        List<Pair<EnumWrappers.ItemSlot, ItemStack>> equipmentList =
+-                                event.getPacket().getSlotStackPairLists().read(0);
++                        List<Pair<EnumWrappers.ItemSlot, ItemStack>> equipmentList = event.getPacket()
++                                .getSlotStackPairLists().read(0);
+ 
+                         boolean hasMainHandEntry = false;
+                         for (Pair<EnumWrappers.ItemSlot, ItemStack> entry : equipmentList) {
+@@ -165,7 +166,8 @@ public class ProtocolLibHandler {
+                             if (pair.getFirst().equals(EnumWrappers.ItemSlot.MAINHAND)) {
+                                 // Replace mainhand item with offhand gun
+                                 ItemStack offhandItem = prepareOffhandItemForPacket(targetPlayer);
+-                                Pair<EnumWrappers.ItemSlot, ItemStack> newPair = new Pair<>(pair.getFirst(), offhandItem);
++                                Pair<EnumWrappers.ItemSlot, ItemStack> newPair = new Pair<>(pair.getFirst(),
++                                        offhandItem);
+                                 modifiableList.set(i, newPair);
+                                 QAMain.DEBUG("Replaced MAINHAND entry with offhand item");
+                                 modified = true;
+@@ -216,7 +218,8 @@ public class ProtocolLibHandler {
+                         new BukkitRunnable() {
+                             public void run() {
+                                 try {
+-                                    PacketContainer pc2 = protocolManager.createPacket(PacketType.Play.Server.ENTITY_EQUIPMENT);
++                                    PacketContainer pc2 = protocolManager
++                                            .createPacket(PacketType.Play.Server.ENTITY_EQUIPMENT);
+ 
+                                     pc2.getIntegers().write(0, entityId);
+                                     pc2.getItemSlots().write(1, slot);
+@@ -251,16 +254,14 @@ public class ProtocolLibHandler {
+                 });
+     }
+ 
+-
+     public static void sendYawChange(Player player, Vector newDirection) {
+         try {
+             if (protocolManager == null)
+                 protocolManager = ProtocolLibrary.getProtocolManager();
+             final PacketContainer yawpack = protocolManager.createPacket(PacketType.Play.Server.LOOK_AT, false);
+-            yawpack.getIntegers().write(0, 1);
+-            yawpack.getDoubles().write(0, player.getEyeLocation().getX() + newDirection.getX());
+-            yawpack.getDoubles().write(1, player.getEyeLocation().getY() + newDirection.getY());
+-            yawpack.getDoubles().write(2, player.getEyeLocation().getZ() + newDirection.getZ());
++            yawpack.getDoubles().write(0, player.getEyeLocation().getX() + newDirection.getX() * 1000);
++            yawpack.getDoubles().write(1, player.getEyeLocation().getY() + newDirection.getY() * 1000);
++            yawpack.getDoubles().write(2, player.getEyeLocation().getZ() + newDirection.getZ() * 1000);
+             yawpack.getBooleans().write(0, false);
+             protocolManager.sendServerPacket(player, yawpack);
+         } catch (Exception e) {
+diff --git a/src/main/java/me/zombie_striker/qg/listener/QAListener.java b/src/main/java/me/zombie_striker/qg/listener/QAListener.java
+index e203947..6008631 100644
+--- a/src/main/java/me/zombie_striker/qg/listener/QAListener.java
++++ b/src/main/java/me/zombie_striker/qg/listener/QAListener.java
+@@ -58,37 +58,80 @@ public class QAListener implements Listener {
+ 
+ 	@EventHandler
+ 	public void onDamage(QADamageEvent event) {
+-		if (!(event.getDamager() instanceof Player damager)) return;
+-		if (!(event.getDamaged() instanceof Player damaged)) return;
++		if (!(event.getDamager() instanceof Player damager))
++			return;
++		if (!(event.getDamaged() instanceof Player damaged))
++			return;
+ 
+ 		ItemStack chestPlate = damaged.getInventory().getChestplate();
++
++		double finalDamage = event.getGun().getDamage();
++
++		// 1. Calculate Base Damage (Headshot vs Normal)
++		if (event.isHeadshot()) {
++			if (event.getGun().getHeadshotDamage() > -1) {
++				finalDamage = event.getGun().getHeadshotDamage();
++			} else {
++				finalDamage = finalDamage * 1.5;
++			}
++		}
++
++		// 2. Apply Armor Logic
+ 		if (chestPlate != null && !chestPlate.getType().isAir()) {
+ 			switch (chestPlate.getType()) {
+ 				case DIAMOND_CHESTPLATE:
+-					event.setDamage(event.getDamage() * 0.65);
++					if (event.isHeadshot()) {
++						if (event.getGun().getDiamondHeadshotDamage() > -1) {
++							finalDamage = event.getGun().getDiamondHeadshotDamage();
++						} else {
++							finalDamage = finalDamage * 0.406;
++						}
++					} else {
++						if (event.getGun().getDiamondDamage() > -1) {
++							finalDamage = event.getGun().getDiamondDamage();
++						} else {
++							finalDamage = finalDamage * 0.406;
++						}
++					}
+ 					break;
+ 				case GOLDEN_CHESTPLATE:
+-					event.setDamage(event.getDamage() * 0.8);
++					if (event.isHeadshot()) {
++						if (event.getGun().getGoldenHeadshotDamage() > -1) {
++							finalDamage = event.getGun().getGoldenHeadshotDamage();
++						} else {
++							finalDamage = finalDamage * 0.583;
++						}
++					} else {
++						if (event.getGun().getGoldenDamage() > -1) {
++							finalDamage = event.getGun().getGoldenDamage();
++						} else {
++							finalDamage = finalDamage * 0.583;
++						}
++					}
+ 					break;
+ 			}
+ 		}
+ 
++		event.setDamage(finalDamage);
++
+ 		Gun gun = event.getGun();
+ 
+ 		String info = "┬ºa╔¬╔┤Û£░ß┤Å╩Çß┤ìß┤Çß┤ó╔¬ß┤Å╔┤╔¬ Ðòß┤ÿß┤Ç╩Çß┤Å\n\n┬º7Arma: ┬ºf" + gun.getName() + "\n┬º7Danno: ┬ºf" +
+-					  DECIMAL_FORMAT.format(event.getDamage()) + "\n\n┬º7Posizione " + damager.getName() +
+-					  ": ┬ºf" + damager.getLocation().getBlockX() + ", " + damager.getLocation().getBlockY() +
+-					  ", " + damager.getLocation().getBlockZ() + "\n┬º7Posizione " + damaged.getName() + ": ┬ºf" +
+-					  damaged.getLocation().getBlockX() + ", " + damaged.getLocation().getBlockY() + ", " +
+-					  damaged.getLocation().getBlockZ() + "\n\n┬ºeClicca per teletrasportarti\n";
+-
+-		Component text = text("┬º2[SPARO] ┬ºa" + damager.getName() + "┬º7 ha sparato a ┬ºa" + damaged.getName() + " ┬º7con ┬ºa" + gun.getName() + ".")
++				DECIMAL_FORMAT.format(event.getDamage()) + "\n\n┬º7Posizione " + damager.getName() +
++				": ┬ºf" + damager.getLocation().getBlockX() + ", " + damager.getLocation().getBlockY() +
++				", " + damager.getLocation().getBlockZ() + "\n┬º7Posizione " + damaged.getName() + ": ┬ºf" +
++				damaged.getLocation().getBlockX() + ", " + damaged.getLocation().getBlockY() + ", " +
++				damaged.getLocation().getBlockZ() + "\n\n┬ºeClicca per teletrasportarti\n";
++
++		Component text = text("┬º2[SPARO] ┬ºa" + damager.getName() + "┬º7 ha sparato a ┬ºa" + damaged.getName()
++				+ " ┬º7con ┬ºa" + gun.getName() + ".")
+ 				.clickEvent(ClickEvent.runCommand("/tp " + damager.getName()))
+ 				.hoverEvent(HoverEvent.showText(text(info)));
+ 
+ 		for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+ 			boolean hasPermission = onlinePlayer.hasPermission("qa.notify");
+-			if (hasPermission && !onlinePlayer.getPersistentDataContainer().has(QAMain.getInstance().getNotifyKey(), PersistentDataType.BYTE)) {
++			if (hasPermission && !onlinePlayer.getPersistentDataContainer().has(QAMain.getInstance().getNotifyKey(),
++					PersistentDataType.BYTE)) {
+ 				onlinePlayer.sendMessage(text);
+ 			}
+ 		}
+@@ -114,7 +157,8 @@ public class QAListener implements Listener {
+ 				}
+ 
+ 				if (e.getEntity() instanceof Player) {
+-					if (unloadingPlayers.contains(damager.getName())) return;
++					if (unloadingPlayers.contains(damager.getName()))
++						return;
+ 
+ 					CustomBaseObject object = null;
+ 					if (!QualityArmory.isCustomItem(damager.getItemInHand())) {
+@@ -146,13 +190,16 @@ public class QAListener implements Listener {
+ 				}
+ 
+ 				if (QAMain.allowGunHitEntities && !ignoreClick.contains(damager.getUniqueId())) {
+-                    Gun g = QualityArmory.getGun(damager.getItemInHand());
+-                    if (IronsightsHandler.isAiming(damager)) g = IronsightsHandler.getGunUsed(damager);
++					Gun g = QualityArmory.getGun(damager.getItemInHand());
++					if (IronsightsHandler.isAiming(damager))
++						g = IronsightsHandler.getGunUsed(damager);
+ 
+-					if (g == null || !damager.getLocation().getWorld().equals(e.getEntity().getLocation().getWorld())) return;
++					if (g == null || !damager.getLocation().getWorld().equals(e.getEntity().getLocation().getWorld()))
++						return;
+ 
+ 					double distance = damager.getLocation().distance(e.getEntity().getLocation());
+-					if (distance > 5) return;
++					if (distance > 5)
++						return;
+ 
+ 					ignoreClick.add(damager.getUniqueId());
+ 
+@@ -201,7 +248,8 @@ public class QAListener implements Listener {
+ 
+ 	@EventHandler
+ 	public void onPlayerSwapHandItems(PlayerSwapHandItemsEvent event) {
+-		if (event.isCancelled()) return;
++		if (event.isCancelled())
++			return;
+ 
+ 		if (QualityArmory.isIronSights(event.getOffHandItem())) {
+ 			event.setCancelled(true);
+@@ -221,7 +269,6 @@ public class QAListener implements Listener {
+ 			}
+ 		}
+ 
+-
+ 		if (!QAMain.enableIronSightsON_RIGHT_CLICK) {
+ 			DEBUG("Sneak Toggle Called");
+ 			try {
+@@ -237,7 +284,8 @@ public class QAListener implements Listener {
+ 							if (!itemInMainHand.equals(itemInOffHand))
+ 								e.getPlayer().getInventory().addItem(itemInOffHand);
+ 							e.getPlayer().getInventory().setItemInOffHand(null);
+-							DEBUG("Removing custom item from offhand when it shouldn't be there. Custom item = " + offhandObj.getName());
++							DEBUG("Removing custom item from offhand when it shouldn't be there. Custom item = "
++									+ offhandObj.getName());
+ 						}
+ 					}
+ 					Gun g = QualityArmory.getGun(e.getPlayer().getItemInHand());
+@@ -250,7 +298,7 @@ public class QAListener implements Listener {
+ 								if (!e.getPlayer().getItemInHand().hasItemMeta()
+ 										|| !e.getPlayer().getItemInHand().getItemMeta().hasDisplayName()
+ 										|| e.getPlayer().getItemInHand().getItemMeta().getDisplayName()
+-										.contains(QAMain.S_RELOADING_MESSAGE))
++												.contains(QAMain.S_RELOADING_MESSAGE))
+ 									return;
+ 
+ 								IronsightsHandler.aim(e.getPlayer());
+@@ -258,7 +306,8 @@ public class QAListener implements Listener {
+ 									@Override
+ 									public void run() {
+ 										MaterialStorage ms1 = MaterialStorage.getMS(e.getPlayer().getItemInHand());
+-										MaterialStorage ms2 = MaterialStorage.getMS(e.getPlayer().getInventory().getItemInOffHand());
++										MaterialStorage ms2 = MaterialStorage
++												.getMS(e.getPlayer().getInventory().getItemInOffHand());
+ 										if (ms2 == ms1) {
+ 											e.getPlayer().getInventory().setItemInOffHand(null);
+ 											DEBUG("Item Duped. Got Rid of using offhand override (code=1)");
+@@ -278,7 +327,8 @@ public class QAListener implements Listener {
+ 							@Override
+ 							public void run() {
+ 								MaterialStorage ms1 = MaterialStorage.getMS(e.getPlayer().getItemInHand());
+-								MaterialStorage ms2 = MaterialStorage.getMS(e.getPlayer().getInventory().getItemInOffHand());
++								MaterialStorage ms2 = MaterialStorage
++										.getMS(e.getPlayer().getInventory().getItemInOffHand());
+ 
+ 								if (ms2 == ms1) {
+ 									e.getPlayer().getInventory().setItemInOffHand(null);
+@@ -316,7 +366,8 @@ public class QAListener implements Listener {
+ 		Player morto = event.getEntity();
+ 		Player killer = morto.getKiller();
+ 
+-		if (killer == null) return;
++		if (killer == null)
++			return;
+ 
+ 		ItemStack arma = killer.getInventory().getItemInMainHand();
+ 		String nomeArma = arma.hasItemMeta() && arma.getItemMeta().hasDisplayName()
+@@ -338,10 +389,9 @@ public class QAListener implements Listener {
+ 				+ "┬ºeClicca per teletrasportarti";
+ 
+ 		Component messaggio = Component.text(
+-						"┬º4[MORTE] ┬ºc" + killer.getName()
+-								+ "┬º7 ha ucciso ┬ºc" + morto.getName()
+-								+ " ┬º7con ┬ºc" + nomeArma + "."
+-				)
++				"┬º4[MORTE] ┬ºc" + killer.getName()
++						+ "┬º7 ha ucciso ┬ºc" + morto.getName()
++						+ " ┬º7con ┬ºc" + nomeArma + ".")
+ 				.clickEvent(ClickEvent.runCommand("/tp " + killer.getName()))
+ 				.hoverEvent(HoverEvent.showText(Component.text(info)));
+ 
+@@ -378,7 +428,6 @@ public class QAListener implements Listener {
+ 			}
+ 	}
+ 
+-
+ 	@SuppressWarnings("deprecation")
+ 	@EventHandler(priority = EventPriority.LOWEST)
+ 	public void oninvClick(final InventoryClickEvent e) {
+@@ -386,15 +435,17 @@ public class QAListener implements Listener {
+ 			return;
+ 		String name = null;
+ 
+-		if(e.getClickedInventory() instanceof PlayerInventory) {
++		if (e.getClickedInventory() instanceof PlayerInventory) {
+ 			ItemStack cursor = e.getCursor();
+ 			final int OFFHAND_SLOT = 40;
+ 			// null check is done by isGun
+-			// offhand slot check also works with hotkey inventory swap (F by default) - tested on 1.16.5
+-			if(e.getSlot() == OFFHAND_SLOT && QualityArmory.isGun(cursor)) {
++			// offhand slot check also works with hotkey inventory swap (F by default) -
++			// tested on 1.16.5
++			if (e.getSlot() == OFFHAND_SLOT && QualityArmory.isGun(cursor)) {
+ 				e.setCancelled(true);
+ 				// restore placed item because cancelling an event seems to wipe it.
+-				// it will make cursor item look disappeared, but it'll be dropped when inventory is closed
++				// it will make cursor item look disappeared, but it'll be dropped when
++				// inventory is closed
+ 				e.getView().setCursor(cursor);
+ 			} else {
+ 				ItemStack item = e.getCurrentItem();
+@@ -407,17 +458,20 @@ public class QAListener implements Listener {
+ 			try {
+ 				if (e.getClick() == ClickType.SWAP_OFFHAND &&
+ 						QualityArmory.isGun(e.getWhoClicked().getInventory().getItemInOffHand()) &&
+-				        QualityArmory.isIronSights(e.getWhoClicked().getInventory().getItemInMainHand())) {
++						QualityArmory.isIronSights(e.getWhoClicked().getInventory().getItemInMainHand())) {
+ 					e.setCancelled(true);
+-                    IronsightsHandler.unAim((Player) e.getWhoClicked());
++					IronsightsHandler.unAim((Player) e.getWhoClicked());
+ 					return;
+ 				}
+-			} catch (Error | Exception ignored) {}
++			} catch (Error | Exception ignored) {
++			}
+ 		}
+ 
+-		if (!(e.getInventory().getHolder() instanceof QAInventoryHolder)) return;
++		if (!(e.getInventory().getHolder() instanceof QAInventoryHolder))
++			return;
+ 
+-		if (e.getView().getTitle().startsWith((QAMain.S_craftingBenchName)) || e.getView().getTitle().startsWith((QAMain.S_shopName))) {
++		if (e.getView().getTitle().startsWith((QAMain.S_craftingBenchName))
++				|| e.getView().getTitle().startsWith((QAMain.S_shopName))) {
+ 			if (e.getClick().isShiftClick()) {
+ 				e.setCancelled(true);
+ 				return;
+@@ -437,7 +491,8 @@ public class QAListener implements Listener {
+ 				if (!QAMain.enableEconomy) {
+ 					try {
+ 						QAMain.enableEconomy = EconHandler.setupEconomy();
+-					} catch (Exception | Error ignored) {}
++					} catch (Exception | Error ignored) {
++					}
+ 				}
+ 
+ 				if (!QAMain.enableEconomy) {
+@@ -460,7 +515,8 @@ public class QAListener implements Listener {
+ 					if (e.getCurrentItem().isSimilar(QAMain.nextButton)) {
+ 						int page = Integer.parseInt(e.getView().getTitle().split(QAMain.S_shopName)[1]) + 1;
+ 						e.getWhoClicked().closeInventory();
+-						e.getWhoClicked().openInventory(QAMain.createShop(Math.min(QualityArmory.getMaxPagesForGUI(), page)));
++						e.getWhoClicked()
++								.openInventory(QAMain.createShop(Math.min(QualityArmory.getMaxPagesForGUI(), page)));
+ 						DEBUG("next_Shop");
+ 						return;
+ 					}
+@@ -475,7 +531,8 @@ public class QAListener implements Listener {
+ 					if (e.getCurrentItem().isSimilar(QAMain.nextButton)) {
+ 						int page = Integer.parseInt(e.getView().getTitle().split(QAMain.S_craftingBenchName)[1]) + 1;
+ 						e.getWhoClicked().closeInventory();
+-						e.getWhoClicked().openInventory(QAMain.createCraft(Math.min(QualityArmory.getMaxPagesForGUI(), page)));
++						e.getWhoClicked()
++								.openInventory(QAMain.createCraft(Math.min(QualityArmory.getMaxPagesForGUI(), page)));
+ 						DEBUG("next_craft");
+ 						return;
+ 					}
+@@ -528,14 +585,17 @@ public class QAListener implements Listener {
+ 							QAMain.removeForIngre((Player) e.getWhoClicked(), g);
+ 
+ 						if (g instanceof Gun) {
+-							QAGunGiveEvent event = new QAGunGiveEvent(((Player) e.getWhoClicked()), ((Gun) g), QAGunGiveEvent.Cause.SHOP);
++							QAGunGiveEvent event = new QAGunGiveEvent(((Player) e.getWhoClicked()), ((Gun) g),
++									QAGunGiveEvent.Cause.SHOP);
+ 							Bukkit.getPluginManager().callEvent(event);
+-							if (event.isCancelled()) return;
++							if (event.isCancelled())
++								return;
+ 							g = event.getGun();
+ 						}
+ 
+-						ItemStack s = CustomItemManager.getItemType("gun").getItem(g.getItemData().getMat(), g.getItemData().getData(), g.getItemData().getVariant());
+-						QualityArmory.giveOrDrop(e.getWhoClicked(),s);
++						ItemStack s = CustomItemManager.getItemType("gun").getItem(g.getItemData().getMat(),
++								g.getItemData().getData(), g.getItemData().getVariant());
++						QualityArmory.giveOrDrop(e.getWhoClicked(), s);
+ 						QAMain.shopsSounds(e, shop);
+ 						DEBUG("Buy-Item");
+ 					} else {
+@@ -627,14 +687,16 @@ public class QAListener implements Listener {
+ 			return;
+ 		} else if (QualityArmory.isCustomItem(e.getCurrentItem())) {
+ 			CustomBaseObject base = null;
+-			if ((base = QualityArmory.getCustomItem(e.getCurrentItem())) == QualityArmory.getCustomItem(e.getCursor())) {
+-				//Cursor and click are same custom item.
++			if ((base = QualityArmory.getCustomItem(e.getCurrentItem())) == QualityArmory
++					.getCustomItem(e.getCursor())) {
++				// Cursor and click are same custom item.
+ 				if (e.getCursor() != null && e.getCurrentItem() != null && base != null)
+ 					if (e.getCursor().getAmount() + e.getCurrentItem().getAmount() <= base.getMaxItemStack()) {
+ 						e.getCursor().setAmount(e.getCurrentItem().getAmount() + e.getCursor().getAmount());
+ 						e.getCurrentItem().setType(Material.AIR);
+ 					} else {
+-						e.getCurrentItem().setAmount(e.getCursor().getAmount() + e.getCurrentItem().getAmount() - base.getMaxItemStack());
++						e.getCurrentItem().setAmount(
++								e.getCursor().getAmount() + e.getCurrentItem().getAmount() - base.getMaxItemStack());
+ 						e.getCursor().setAmount(base.getMaxItemStack());
+ 					}
+ 			}
+@@ -642,7 +704,7 @@ public class QAListener implements Listener {
+ 		}
+ 	}
+ 
+-	@SuppressWarnings({"deprecation", "unchecked"})
++	@SuppressWarnings({ "deprecation", "unchecked" })
+ 	@EventHandler
+ 	public void onPickup(PlayerPickupItemEvent e) {
+ 		if (e.isCancelled())
+@@ -663,7 +725,10 @@ public class QAListener implements Listener {
+ 								for (Gun g2 : QAMain.gunRegister.values()) {
+ 									if (g2.is18Support()) {
+ 										if (g2.getDisplayName().equals(g.getDisplayName())) {
+-											e.getItem().setItemStack(CustomItemManager.getItemType("gun").getItem(g2.getItemData().getMat(), g2.getItemData().getData(), g2.getItemData().getVariant()));
++											e.getItem()
++													.setItemStack(CustomItemManager.getItemType("gun").getItem(
++															g2.getItemData().getMat(), g2.getItemData().getData(),
++															g2.getItemData().getVariant()));
+ 											QAMain.DEBUG("Custom-validation check 1");
+ 											return;
+ 										}
+@@ -674,7 +739,10 @@ public class QAListener implements Listener {
+ 								for (Gun g2 : QAMain.gunRegister.values()) {
+ 									if (g2.is18Support()) {
+ 										if (g2.getAmmoType().equals(g.getAmmoType())) {
+-											e.getItem().setItemStack(CustomItemManager.getItemType("gun").getItem(g2.getItemData().getMat(), g2.getItemData().getData(), g2.getItemData().getVariant()));
++											e.getItem()
++													.setItemStack(CustomItemManager.getItemType("gun").getItem(
++															g2.getItemData().getMat(), g2.getItemData().getData(),
++															g2.getItemData().getVariant()));
+ 											QAMain.DEBUG("Custom-validation check 2");
+ 											return;
+ 										}
+@@ -688,7 +756,10 @@ public class QAListener implements Listener {
+ 									for (Gun g2 : QAMain.gunRegister.values()) {
+ 										if (!g2.is18Support()) {
+ 											if (g2.getDisplayName().equals(g.getDisplayName())) {
+-												e.getItem().setItemStack(CustomItemManager.getItemType("gun").getItem(g2.getItemData().getMat(), g2.getItemData().getData(), g2.getItemData().getVariant()));
++												e.getItem()
++														.setItemStack(CustomItemManager.getItemType("gun").getItem(
++																g2.getItemData().getMat(), g2.getItemData().getData(),
++																g2.getItemData().getVariant()));
+ 												QAMain.DEBUG("Custom-validation check 3");
+ 												return;
+ 											}
+@@ -699,7 +770,10 @@ public class QAListener implements Listener {
+ 									for (Gun g2 : QAMain.gunRegister.values()) {
+ 										if (!g2.is18Support()) {
+ 											if (g2.getAmmoType().equals(g.getAmmoType())) {
+-												e.getItem().setItemStack(CustomItemManager.getItemType("gun").getItem(g2.getItemData().getMat(), g2.getItemData().getData(), g2.getItemData().getVariant()));
++												e.getItem()
++														.setItemStack(CustomItemManager.getItemType("gun").getItem(
++																g2.getItemData().getMat(), g2.getItemData().getData(),
++																g2.getItemData().getVariant()));
+ 												QAMain.DEBUG("Custom-validation check 4");
+ 												return;
+ 											}
+@@ -720,7 +794,8 @@ public class QAListener implements Listener {
+ 			}
+ 
+ 			if (QualityArmory.isAmmo(e.getItem().getItemStack())) {
+-				QualityArmory.addAmmoToInventory(e.getPlayer(), QAMain.ammoRegister.get(MaterialStorage.getMS(e.getItem().getItemStack())),
++				QualityArmory.addAmmoToInventory(e.getPlayer(),
++						QAMain.ammoRegister.get(MaterialStorage.getMS(e.getItem().getItemStack())),
+ 						e.getItem().getItemStack().getAmount());
+ 				e.setCancelled(true);
+ 				e.getItem().remove();
+@@ -739,7 +814,7 @@ public class QAListener implements Listener {
+ 			Gun g = QualityArmory.getGun(e.getItemDrop().getItemStack());
+ 			if (g != null) {
+ 				e.setCancelled(true);
+-				reload(e.getPlayer(),g);
++				reload(e.getPlayer(), g);
+ 			}
+ 		}
+ 	}
+@@ -761,7 +836,6 @@ public class QAListener implements Listener {
+ 			e.setCancelled(true);
+ 	}
+ 
+-
+ 	@EventHandler
+ 	public void onDeathChat(PlayerDeathEvent e) {
+ 		if (QAMain.changeDeathMessages) {
+@@ -773,15 +847,13 @@ public class QAListener implements Listener {
+ 						e.setDeathMessage(((Gun) base).getDeathMessage()
+ 								.replaceAll("%player%", e.getEntity().getDisplayName())
+ 								.replaceAll("%killer%", killer.getDisplayName())
+-								.replaceAll("%name%", base.getDisplayName())
+-						);
++								.replaceAll("%name%", base.getDisplayName()));
+ 					}
+ 				}
+ 			}
+ 		}
+ 	}
+ 
+-
+ 	@SuppressWarnings("deprecation")
+ 	@EventHandler(priority = EventPriority.HIGH)
+ 	public void onDeath(PlayerDeathEvent e) {
+@@ -791,7 +863,8 @@ public class QAListener implements Listener {
+ 			if (QualityArmory.isIronSights(is)) {
+ 				e.getDrops().remove(is);
+ 				DEBUG("Removing IronSights");
+-			} else if (is.hasItemMeta() && is.getItemMeta().hasDisplayName() && is.getItemMeta().getDisplayName().contains(QAMain.S_RELOADING_MESSAGE)) {
++			} else if (is.hasItemMeta() && is.getItemMeta().hasDisplayName()
++					&& is.getItemMeta().getDisplayName().contains(QAMain.S_RELOADING_MESSAGE)) {
+ 				Gun g = QualityArmory.getGun(is);
+ 				ItemMeta im = is.getItemMeta();
+ 				im.setDisplayName(g.getDisplayName());
+@@ -806,9 +879,11 @@ public class QAListener implements Listener {
+ 		}
+ 
+ 		if (e.getDeathMessage() != null
+-				&& e.getDeathMessage().contains(QualityArmory.getIronSightsItemStack().getItemMeta().getDisplayName())) {
++				&& e.getDeathMessage()
++						.contains(QualityArmory.getIronSightsItemStack().getItemMeta().getDisplayName())) {
+ 			try {
+-				e.setDeathMessage(e.getDeathMessage().replace(QualityArmory.getIronSightsItemStack().getItemMeta().getDisplayName(),
++				e.setDeathMessage(e.getDeathMessage().replace(
++						QualityArmory.getIronSightsItemStack().getItemMeta().getDisplayName(),
+ 						e.getEntity().getKiller().getInventory().getItemInOffHand().getItemMeta().getDisplayName()));
+ 				DEBUG("Removing ironsights from death message and replaced with gun's name");
+ 			} catch (Error | Exception e34) {
+@@ -858,7 +933,8 @@ public class QAListener implements Listener {
+ 							+ (QAMain.overrideURL ? 0 : 3);
+ 
+ 					// if (e.getItem().getDurability() == 1) {
+-					QAMain.DEBUG("Safe Durib= " + (safeDurib) + "! ORG " + e.getPlayer().getItemInHand().getDurability());
++					QAMain.DEBUG(
++							"Safe Durib= " + (safeDurib) + "! ORG " + e.getPlayer().getItemInHand().getDurability());
+ 					ItemStack is = e.getPlayer().getItemInHand();
+ 					is.setDurability((short) (safeDurib));
+ 					is = Gun.addCalulatedExtraDurib(is, safeDurib - e.getPlayer().getItemInHand().getDurability());
+@@ -873,7 +949,8 @@ public class QAListener implements Listener {
+ 					if (QualityArmory.isCustomItemNextId(e.getPlayer().getInventory().getItemInOffHand())) {
+ 						QAMain.DEBUG("A player is using a non-gun item, but may reach the textures of one!");
+ 						// If the item is not a gun, but the item below it is
+-						int safeDurib = QualityArmory.findSafeSpot(e.getPlayer().getInventory().getItemInOffHand(), true,
++						int safeDurib = QualityArmory.findSafeSpot(e.getPlayer().getInventory().getItemInOffHand(),
++								true,
+ 								QAMain.overrideURL) + (QAMain.overrideURL ? 0 : 3);
+ 
+ 						// if (e.getItem().getDurability() == 1) {
+@@ -916,11 +993,13 @@ public class QAListener implements Listener {
+ 
+ 	@EventHandler
+ 	public void onPlayerChangeSlot(PlayerItemHeldEvent event) {
+-		if (event.isCancelled()) return;
++		if (event.isCancelled())
++			return;
+ 
+ 		Player player = event.getPlayer();
+ 		boolean remove = unloadingPlayers.remove(player.getName());
+-		if (!remove) return;
++		if (!remove)
++			return;
+ 
+ 		player.sendMessage(text("\n ┬ºc╔¬╔┤ß┤øß┤ç╩Ç╩Çß┤Åß┤øß┤øß┤Å \n ┬º7Hai interrotto lo scaricamento dell'arma. \n"));
+ 	}
+@@ -929,23 +1008,28 @@ public class QAListener implements Listener {
+ 	public void onPlayerDrop(PlayerDropItemEvent event) {
+ 		ItemStack itemStack = event.getItemDrop().getItemStack();
+ 		Gun gun = QualityArmory.getGun(itemStack);
+-		if (gun == null) return;
++		if (gun == null)
++			return;
+ 
+ 		event.setCancelled(true);
+ 
+ 		int amount = Gun.getAmount(itemStack);
+-		if (amount <= 0) return;
++		if (amount <= 0)
++			return;
+ 
+ 		Player player = event.getPlayer();
+-		if (player.getOpenInventory().getType() != InventoryType.CRAFTING) return;
++		if (player.getOpenInventory().getType() != InventoryType.CRAFTING)
++			return;
+ 
+-		if (unloadingPlayers.contains(player.getName())) return;
++		if (unloadingPlayers.contains(player.getName()))
++			return;
+ 
+ 		player.chat("*Sta scaricando " + gun.getName() + "*");
+ 		unloadingPlayers.add(player.getName());
+ 
+ 		Bukkit.getScheduler().runTaskLater(QAMain.getInstance(), () -> {
+-			if (!unloadingPlayers.contains(player.getName())) return;
++			if (!unloadingPlayers.contains(player.getName()))
++				return;
+ 			if (!player.getInventory().getItemInMainHand().equals(itemStack)) {
+ 				player.sendMessage(text("\n ┬ºc╔¬╔┤ß┤øß┤ç╩Ç╩Çß┤Åß┤øß┤øß┤Å \n ┬º7Hai interrotto lo scaricamento dell'arma. \n"));
+ 				unloadingPlayers.remove(player.getName());
+@@ -961,17 +1045,20 @@ public class QAListener implements Listener {
+ 
+ 	@EventHandler
+ 	public void onPlayerHandSwap(PlayerSwapHandItemsEvent event) {
+-		if (!unloadingPlayers.contains(event.getPlayer().getName())) return;
++		if (!unloadingPlayers.contains(event.getPlayer().getName()))
++			return;
+ 
+ 		event.setCancelled(true);
+ 	}
+ 
+-	@SuppressWarnings({"deprecation"})
++	@SuppressWarnings({ "deprecation" })
+ 	@EventHandler(priority = EventPriority.LOWEST)
+ 	public void onClick(final PlayerInteractEvent e) {
+-		if (unloadingPlayers.contains(e.getPlayer().getName())) return;
++		if (unloadingPlayers.contains(e.getPlayer().getName()))
++			return;
+ 
+-		QAMain.DEBUG("InteractEvent Called. Custom item used = " + QualityArmory.isCustomItem(e.getPlayer().getItemInHand()));
++		QAMain.DEBUG("InteractEvent Called. Custom item used = "
++				+ QualityArmory.isCustomItem(e.getPlayer().getItemInHand()));
+ 		if (!CustomItemManager.isUsingCustomData()) {
+ 			QAMain.DEBUG("Custom Data Check");
+ 			try {
+@@ -980,7 +1067,8 @@ public class QAListener implements Listener {
+ 						if (!e.getPlayer().getItemInHand().getItemMeta().isUnbreakable()) {
+ 							QAMain.DEBUG("A player is using a breakable item that reached being a gun!");
+ 							// If the item is not a gun, but the item below it is
+-							int safeDurib = QualityArmory.findSafeSpot(e.getPlayer().getItemInHand(), true, QAMain.overrideURL)
++							int safeDurib = QualityArmory.findSafeSpot(e.getPlayer().getItemInHand(), true,
++									QAMain.overrideURL)
+ 									+ (QAMain.overrideURL ? 0 : 3);
+ 
+ 							// if (e.getItem().getDurability() == 1) {
+@@ -1067,11 +1155,11 @@ public class QAListener implements Listener {
+ 						if (origin.getDurability() != e.getPlayer().getItemInHand().getDurability()
+ 								&& slot == e.getPlayer().getInventory().getHeldItemSlot()
+ 								&& (e.getPlayer().getItemInHand() != null
+-								&& e.getPlayer().getItemInHand().getType() == origin.getType())) {
++										&& e.getPlayer().getItemInHand().getType() == origin.getType())) {
+ 							try {
+ 								if (QualityArmory.isIronSights(e.getPlayer().getItemInHand())
+ 										&& origin.getDurability() == e.getPlayer().getInventory().getItemInOffHand()
+-										.getDurability())
++												.getDurability())
+ 									return;
+ 								if (temp2 != null
+ 										&& temp2.getDurability() == e.getPlayer().getItemInHand().getDurability())
+@@ -1116,11 +1204,13 @@ public class QAListener implements Listener {
+ 				}
+ 			}
+ 			try {
+-				if (!IronsightsHandler.isAiming(e.getPlayer()) && event.getPlayer().getInventory().getItemInOffHand().equals(e.getItem())) {
++				if (!IronsightsHandler.isAiming(e.getPlayer())
++						&& event.getPlayer().getInventory().getItemInOffHand().equals(e.getItem())) {
+ 					e.setCancelled(true);
+ 					return;
+ 				}
+-			} catch (Throwable ignored) {}
++			} catch (Throwable ignored) {
++			}
+ 
+ 			CustomBaseObject qaItem = QualityArmory.getCustomItem(usedItem);
+ 			if (qaItem != null) {
+@@ -1142,7 +1232,8 @@ public class QAListener implements Listener {
+ 			return;
+ 		ItemStack prev = e.getPlayer().getInventory().getItem(e.getPreviousSlot());
+ 		ItemStack newslot = e.getPlayer().getInventory().getItem(e.getNewSlot());
+-		if (QualityArmory.isIronSights(prev) && QualityArmory.isCustomItem(e.getPlayer().getInventory().getItemInOffHand())) {
++		if (QualityArmory.isIronSights(prev)
++				&& QualityArmory.isCustomItem(e.getPlayer().getInventory().getItemInOffHand())) {
+ 			int ammoCount = Gun.getAmount(e.getPlayer());
+ 
+ 			e.getPlayer().getInventory().setItem(e.getPreviousSlot(), e.getPlayer().getInventory().getItemInOffHand());
+@@ -1171,11 +1262,11 @@ public class QAListener implements Listener {
+ 			QAMain.lastWeaponSwitch.put(e.getPlayer().getUniqueId(), System.currentTimeMillis());
+ 		}
+ 
+-		if(QAMain.showAmmoInXPBar) {
++		if (QAMain.showAmmoInXPBar) {
+ 			CustomBaseObject customBase = QualityArmory.getCustomItem(newslot);
+ 			if (customBase instanceof Gun) {
+-				GunUtil.updateXPBar(e.getPlayer(), (Gun) customBase,Gun.getAmount(newslot));
+-			}else{
++				GunUtil.updateXPBar(e.getPlayer(), (Gun) customBase, Gun.getAmount(newslot));
++			} else {
+ 				e.getPlayer().setExp(0);
+ 				e.getPlayer().setLevel(0);
+ 			}
+@@ -1289,7 +1380,7 @@ public class QAListener implements Listener {
+ 						}
+ 						if (e.getPlayer().getItemInHand().getType() != e.getItemDrop().getItemStack().getType()
+ 								|| e.getPlayer().getItemInHand().getDurability() != e.getItemDrop().getItemStack()
+-								.getDurability()) {
++										.getDurability()) {
+ 							return;
+ 						}
+ 						Gun g = QualityArmory.getGun(e.getItemDrop().getItemStack());
+@@ -1333,7 +1424,8 @@ public class QAListener implements Listener {
+ 
+ 		if (QualityArmory.isGun(item)) {
+ 			Gun g = QualityArmory.getGun(item);
+-			if (g == null) return;
++			if (g == null)
++				return;
+ 
+ 			if (g.getGlow() != null && QAMain.coloredGunScoreboard != null) {
+ 				for (Scoreboard s : QAMain.coloredGunScoreboard)
+@@ -1350,4 +1442,3 @@ public class QAListener implements Listener {
+ 		QAMain.DEBUG(s);
+ 	}
+ }
+-
+diff --git a/src/main/java/me/zombie_striker/qg/miscitems/MeleeItems.java b/src/main/java/me/zombie_striker/qg/miscitems/MeleeItems.java
+index 203abe5..82aff8e 100644
+--- a/src/main/java/me/zombie_striker/qg/miscitems/MeleeItems.java
++++ b/src/main/java/me/zombie_striker/qg/miscitems/MeleeItems.java
+@@ -13,38 +13,37 @@ import org.bukkit.inventory.ItemStack;
+ import me.zombie_striker.customitemmanager.ArmoryBaseObject;
+ import me.zombie_striker.customitemmanager.MaterialStorage;
+ 
+-public class MeleeItems extends CustomBaseObject implements ArmoryBaseObject{
++public class MeleeItems extends CustomBaseObject implements ArmoryBaseObject {
+ 
+ 	List<UUID> medkitHeartUsage = new ArrayList<>();
+ 	HashMap<UUID, Long> lastTimeHealed = new HashMap<>();
+ 	HashMap<UUID, Double> PercentTimeHealed = new HashMap<>();
+ 
+-	int damage = 1;
++	double damage = 1;
+ 
+-	public MeleeItems(MaterialStorage ms, String name, String displayname, ItemStack[] ings, int cost, int damage) {
+-		super(name,ms,displayname,null,false);
++	public MeleeItems(MaterialStorage ms, String name, String displayname, ItemStack[] ings, int cost, double damage) {
++		super(name, ms, displayname, null, false);
+ 		this.setPrice(cost);
+ 		super.setIngredients(ings);
+ 		this.damage = damage;
+ 	}
+ 
+-
+ 	@Override
+ 	public int getCraftingReturn() {
+ 		return 1;
+ 	}
+ 
+-
+-	public int getDamage() {
++	public double getDamage() {
+ 		return damage;
+ 	}
++
+ 	@Override
+ 	public boolean is18Support() {
+ 		return false;
+ 	}
+ 
+ 	@Override
+-	public void set18Supported(boolean b) {		
++	public void set18Supported(boolean b) {
+ 	}
+ 
+ 	@Override
+@@ -62,12 +61,13 @@ public class MeleeItems extends CustomBaseObject implements ArmoryBaseObject{
+ 		// TODO Auto-generated method stub
+ 		return false;
+ 	}
++
+ 	@Override
+ 	public ItemStack getItemStack() {
+-		return CustomItemManager.getItemType("gun").getItem(this.getItemData().getMat(),this.getItemData().getData(),this.getItemData().getVariant());
++		return CustomItemManager.getItemType("gun").getItem(this.getItemData().getMat(), this.getItemData().getData(),
++				this.getItemData().getVariant());
+ 	}
+ 
+-
+ 	@Override
+ 	public boolean onSwapTo(Player shooter, ItemStack usedItem) {
+ 		if (getSoundOnEquip() != null)
+diff --git a/src/main/java/me/zombie_striker/qg/npcs_sentinel/SentinelQAHandler.java b/src/main/java/me/zombie_striker/qg/npcs_sentinel/SentinelQAHandler.java
+index 5b9dc0f..bd1c7fa 100644
+--- a/src/main/java/me/zombie_striker/qg/npcs_sentinel/SentinelQAHandler.java
++++ b/src/main/java/me/zombie_striker/qg/npcs_sentinel/SentinelQAHandler.java
+@@ -24,8 +24,7 @@ public class SentinelQAHandler extends SentinelIntegration {
+ 		return "";
+ 	}
+ 
+-
+-	private HashMap<UUID,Long> lastTimeShot = new HashMap<>();
++	private HashMap<UUID, Long> lastTimeShot = new HashMap<>();
+ 
+ 	@SuppressWarnings("deprecation")
+ 	@Override
+@@ -36,7 +35,7 @@ public class SentinelQAHandler extends SentinelIntegration {
+ 		}
+ 		ItemStack itm = ((Player) st.getLivingEntity()).getItemInHand();
+ 		Gun g = QualityArmory.getGun(itm);
+-		QAMain.DEBUG("Getting gun! gun = "+g);
++		QAMain.DEBUG("Getting gun! gun = " + g);
+ 		if (g == null)
+ 			return false;
+ 		// CSDirector direc = (CSDirector)
+@@ -46,19 +45,18 @@ public class SentinelQAHandler extends SentinelIntegration {
+ 		// return false;
+ 		// }
+ 
+-		if(st.needsAmmo){
+-			if(GunUtil.hasAmmo((Player) st.getLivingEntity(),g)){
++		if (st.needsAmmo) {
++			if (GunUtil.hasAmmo((Player) st.getLivingEntity(), g)) {
+ 				int amount = Gun.getAmount((Player) st.getLivingEntity());
+-				if(amount <=0){
+-					GunUtil.basicReload(g, (Player) st.getLivingEntity(),false);
++				if (amount <= 0) {
++					GunUtil.basicReload(g, (Player) st.getLivingEntity(), false);
+ 					return false;
+ 				}
+-			}else{
++			} else {
+ 				return false;
+ 			}
+ 		}
+ 
+-
+ 		Vector faceAcc = ent.getEyeLocation().toVector().subtract(st.getLivingEntity().getEyeLocation().toVector());
+ 		if (faceAcc.lengthSquared() > 0.0) {
+ 			faceAcc = faceAcc.normalize();
+@@ -66,38 +64,43 @@ public class SentinelQAHandler extends SentinelIntegration {
+ 		faceAcc = st.fixForAcc(faceAcc);
+ 		st.faceLocation(st.getLivingEntity().getEyeLocation().clone().add(faceAcc.multiply(10)));
+ 
+-		if(lastTimeShot.containsKey(st.getLivingEntity().getUniqueId())){
+-			if(System.currentTimeMillis()-lastTimeShot.get(st.getLivingEntity().getUniqueId())/1000 < (Math.max(g.isAutomatic()?(10.0/g.getFireRate())/20:g.getDelayBetweenShotsInSeconds()*1.5,g.getDelayBetweenShotsInSeconds()))){
++		if (lastTimeShot.containsKey(st.getLivingEntity().getUniqueId())) {
++			if (System.currentTimeMillis() - lastTimeShot.get(st.getLivingEntity().getUniqueId()) / 1000 < (Math.max(
++					g.isAutomatic() ? (10.0 / g.getFireRate()) / 20 : g.getDelayBetweenShotsInSeconds() * 1.5,
++					g.getDelayBetweenShotsInSeconds()))) {
+ 				return false;
+ 			}
+ 		}
+-		lastTimeShot.put(st.getLivingEntity().getUniqueId(),System.currentTimeMillis());
++		lastTimeShot.put(st.getLivingEntity().getUniqueId(), System.currentTimeMillis());
+ 
+ 		double sway = g.getSway() * st.accuracy;
++		double totalSpread = sway + (g.getBulletsPerShot() > 1 ? g.getBulletSpread() : 0);
+ 		if (g.usesCustomProjctiles()) {
+ 			for (int i = 0; i < g.getBulletsPerShot(); i++) {
+ 				Vector go = st.getLivingEntity().getEyeLocation().getDirection().normalize();
+-				go.add(new Vector((Math.random() * 2 * sway) - sway, (Math.random() * 2 * sway) - sway,
+-						(Math.random() * 2 * sway) - sway)).normalize();
++				go.add(new Vector((Math.random() * 2 * totalSpread) - totalSpread,
++						(Math.random() * 2 * totalSpread) - totalSpread,
++						(Math.random() * 2 * totalSpread) - totalSpread)).normalize();
+ 				Vector two = go.clone();
+ 				g.getCustomProjectile().spawn(g, st.getLivingEntity().getEyeLocation(), (Player) st.getLivingEntity(),
+ 						two);
+ 			}
+ 		} else {
+-			GunUtil.shootInstantVector(g, ((Player) st.getLivingEntity()), sway, g.getDamage(), g.getBulletsPerShot(),
++			GunUtil.shootInstantVector(g, ((Player) st.getLivingEntity()), totalSpread, g.getDamage(),
++					g.getBulletsPerShot(),
+ 					g.getMaxDistance());
+ 		}
+ 
+ 		GunUtil.playShoot(g, (Player) st.getLivingEntity());
+ 		QAMain.DEBUG("Sentinel shooting!");
+-		if(st.needsAmmo){
++		if (st.needsAmmo) {
+ 			int amount = Gun.getAmount((Player) st.getLivingEntity()) - 1;
+ 			ItemMeta im = itm.getItemMeta();
+ 			Gun.updateAmmo(g, (Player) st.getLivingEntity(), amount);
+ 			itm.setItemMeta(im);
+ 		}
+ 		// direc.csminion.weaponInteraction((Player) st.getLivingEntity(), node, false);
+-		 ((Player) st.getLivingEntity()).setItemInHand(itm);
++		((Player) st.getLivingEntity()).setItemInHand(itm);
+ 		if (st.rangedChase) {
+ 			st.attackHelper.rechase();
+ 			QAMain.DEBUG("Sentinel rechase");
+diff --git a/src/main/resources/changelog.txt b/src/main/resources/changelog.txt
+index e796490..d54edb3 100644
+--- a/src/main/resources/changelog.txt
++++ b/src/main/resources/changelog.txt
+@@ -1,3 +1,9 @@
++20.0.23-diverso
++  - Aggiunto il rinculo della Visuale
++  - Impostato il rinculo Classico come pusn del personaggio
++  - Aggiunto il sistema dei caricatori - Ancora non funzionante, attivabile con MagazineReloader
++  - Aggiunta la possibilit├á di creare i caricatori, nella cartella
++
+ 2.0.23
+   - Fixed direct entity damage causing double death
+   - Disabled hotbar ammo count if the reload didn't succeed
+diff --git a/src/main/resources/plugin.yml b/src/main/resources/plugin.yml
+index bdf3187..a3c50c5 100644
+--- a/src/main/resources/plugin.yml
++++ b/src/main/resources/plugin.yml
+@@ -1,5 +1,5 @@
+ main: me.zombie_striker.qg.QAMain
+-version: ${project.version}
++version: ${project.version}-diverso
+ api-version: 1.13
+ name: QualityArmory
+ commands:
+@@ -34,3 +34,4 @@ authors:
+   - Zombie_Striker
+   - Lorenzo0111
+   - AlonsoAliaga
++  - LoloCass edited that
+diff --git a/src/main/resources/todo.txt b/src/main/resources/todo.txt
+index 5ff655b..bd64a14 100644
+--- a/src/main/resources/todo.txt
++++ b/src/main/resources/todo.txt
+@@ -1,4 +1,5 @@
+ TODO:
+ -Make it so it detects if multiple RMB packets are being sent continuously   ==CHECK
+ --chainsaw with aura
+--Knockback for shooters  ==check
+\ No newline at end of file
++-Knockback for shooters  ==check
++- Fare s├¼ che l'handler VADA completamente

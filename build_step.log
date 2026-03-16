@@ -1,0 +1,67 @@
+[INFO] Scanning for projects...
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for me.zombie_striker:QualityArmory:jar:2.0.24
+[WARNING] 'dependencies.dependency.systemPath' for com.bekvon.bukkit:Residence:jar should not point at files within the project directory, ${project.basedir}/libs/Residence.jar will be unresolvable by dependent projects @ line 193, column 25
+[WARNING] 'dependencies.dependency.systemPath' for me.frep:Vulcan:jar should not point at files within the project directory, ${project.basedir}/libs/VulcanAPI.jar will be unresolvable by dependent projects @ line 201, column 25
+[WARNING] 'dependencies.dependency.version' for me.frep:Vulcan:jar is either LATEST or RELEASE (both of them are being deprecated) @ line 199, column 22
+[WARNING] 
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING] 
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING] 
+[INFO] Downloading from central: https://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-metadata.xml
+[INFO] Downloading from central: https://repo.maven.apache.org/maven2/org/codehaus/mojo/maven-metadata.xml
+[INFO] Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-metadata.xml (14 kB at 14 kB/s)
+[INFO] Downloaded from central: https://repo.maven.apache.org/maven2/org/codehaus/mojo/maven-metadata.xml (21 kB at 20 kB/s)
+[INFO] 
+[INFO] ------------------< me.zombie_striker:QualityArmory >-------------------
+[INFO] Building QualityArmory 2.0.24
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[WARNING] The POM for org.mcmonkey:sentinel:jar:2.9.0-20240511.175930-1 is invalid, transitive dependencies (if any) will not be available: 10 problems were encountered while building the effective model for org.mcmonkey:sentinel:2.9.0-SNAPSHOT
+[ERROR] 'dependencies.dependency.systemPath' for net.milkbowl.vault:Vault:jar must specify an absolute path but is ${project.basedir}/lib/Vault.jar @ 
+[ERROR] 'dependencies.dependency.systemPath' for com.tommytony:war:jar must specify an absolute path but is ${project.basedir}/lib/war.jar @ 
+[ERROR] 'dependencies.dependency.systemPath' for com.palmergames.bukkit:towny:jar must specify an absolute path but is ${project.basedir}/lib/towny.jar @ 
+[ERROR] 'dependencies.dependency.systemPath' for com.massivecraft:factions:jar must specify an absolute path but is ${basedir}/lib/Factions.jar @ 
+[ERROR] 'dependencies.dependency.systemPath' for com.massivecraft:massivecore:jar must specify an absolute path but is ${basedir}/lib/MassiveCore.jar @ 
+[ERROR] 'dependencies.dependency.systemPath' for com.shampaggon:crackshot:jar must specify an absolute path but is ${basedir}/lib/CrackShot.jar @ 
+[ERROR] 'dependencies.dependency.systemPath' for net.sacredlabyrinth.phaed.simpleclans:SimpleClans:jar must specify an absolute path but is ${basedir}/lib/SimpleClans.jar @ 
+[ERROR] 'dependencies.dependency.systemPath' for simplepets.brainsynder:SimplePets:jar must specify an absolute path but is ${basedir}/lib/SimplePets.jar @ 
+[ERROR] 'dependencies.dependency.systemPath' for com.sk89q:WorldEdit:jar must specify an absolute path but is ${basedir}/lib/WorldEdit.jar @ 
+[ERROR] 'dependencies.dependency.systemPath' for com.sk89q:WorldGuard:jar must specify an absolute path but is ${basedir}/lib/WorldGuard.jar @ 
+
+[WARNING] The POM for org.maxgamer:QuickShop:jar:5.1.2.5 is invalid, transitive dependencies (if any) will not be available: 7 problems were encountered while building the effective model for org.maxgamer:QuickShop:5.1.2.5-SNAPSHOT
+[ERROR] 'dependencies.dependency.systemPath' for me.minebuilders:clearlag:jar must specify an absolute path but is ${project.basedir}/lib/Clearlag-3.2.2.jar @ 
+[ERROR] 'dependencies.dependency.systemPath' for me.vagdedes.spartan:SpartanAPI:jar must specify an absolute path but is ${project.basedir}/lib/SpartanAPI-9.1.jar @ 
+[ERROR] 'dependencies.dependency.systemPath' for com.bekvon.bukkit.residence:Residence:jar must specify an absolute path but is ${project.basedir}/lib/Residence5.0.1.0.jar @ 
+[ERROR] 'dependencies.dependency.systemPath' for org.primesoft.blockshub:BlocksHub:jar must specify an absolute path but is ${project.basedir}/lib/BlocksHub-3.2.1.jar @ 
+[ERROR] 'dependencies.dependency.systemPath' for me.xanium:GemsEconomy:jar must specify an absolute path but is ${project.basedir}/lib/GemsEconomy-4.9.2.jar @ 
+[ERROR] 'dependencies.dependency.systemPath' for tne.tne:TheNewEconomy:jar must specify an absolute path but is ${project.basedir}/lib/TNE-0.1.1.17-PRE-2.jar @ 
+[ERROR] 'dependencies.dependency.systemPath' for com.iridium:IridiumSkyblock:jar must specify an absolute path but is ${project.basedir}/lib/IridiumSkyblock-3.2.3.jar @ 
+
+[INFO] 
+[INFO] --- jar:3.2.2:jar (default-cli) @ QualityArmory ---
+[INFO] Building jar: C:\Users\LoloCass\DiversoQualityArmory\target\QualityArmory.jar
+[INFO] 
+[INFO] --- shade:3.3.0:shade (default-cli) @ QualityArmory ---
+[INFO] Including com.github.cryptomorin:XSeries:jar:13.3.0 in the shaded jar.
+[INFO] Including de.tr7zw:item-nbt-api:jar:2.15.2-SNAPSHOT in the shaded jar.
+[INFO] Including org.codemc.worldguardwrapper:worldguardwrapper:jar:1.2.1-SNAPSHOT in the shaded jar.
+[INFO] Dependency-reduced POM written at: C:\Users\LoloCass\DiversoQualityArmory\dependency-reduced-pom.xml
+[WARNING] QualityArmory.jar, item-nbt-api-2.15.2-SNAPSHOT.jar define 1 overlapping resource: 
+[WARNING]   - META-INF/MANIFEST.MF
+[WARNING] maven-shade-plugin has detected that some class files are
+[WARNING] present in two or more JARs. When this happens, only one
+[WARNING] single version of the class is copied to the uber jar.
+[WARNING] Usually this is not harmful and you can skip these warnings,
+[WARNING] otherwise try to manually exclude artifacts based on
+[WARNING] mvn dependency:tree -Ddetail=true and the above output.
+[WARNING] See https://maven.apache.org/plugins/maven-shade-plugin/
+[INFO] Replacing original artifact with shaded artifact.
+[INFO] Replacing C:\Users\LoloCass\DiversoQualityArmory\target\QualityArmory.jar with C:\Users\LoloCass\DiversoQualityArmory\target\QualityArmory-2.0.24-shaded.jar
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  10.955 s
+[INFO] Finished at: 2026-03-13T22:10:17+01:00
+[INFO] ------------------------------------------------------------------------

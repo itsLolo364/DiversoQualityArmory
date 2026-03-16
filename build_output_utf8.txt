@@ -1,0 +1,259 @@
+﻿[INFO] Scanning for projects...
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for me.zombie_striker:QualityArmory:jar:2.0.24
+[WARNING] 'dependencies.dependency.systemPath' for com.bekvon.bukkit:Residence:jar should not point at files within the project directory, ${project.basedir}/libs/Residence.jar will be unresolvable by dependent projects @ line 193, column 25
+[WARNING] 'dependencies.dependency.systemPath' for me.frep:Vulcan:jar should not point at files within the project directory, ${project.basedir}/libs/VulcanAPI.jar will be unresolvable by dependent projects @ line 201, column 25
+[WARNING] 'dependencies.dependency.version' for me.frep:Vulcan:jar is either LATEST or RELEASE (both of them are being deprecated) @ line 199, column 22
+[WARNING] 
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING] 
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING] 
+[INFO] 
+[INFO] ------------------< me.zombie_striker:QualityArmory >-------------------
+[INFO] Building QualityArmory 2.0.24
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[WARNING] The POM for org.mcmonkey:sentinel:jar:2.9.0-20240511.175930-1 is invalid, transitive dependencies (if any) will not be available: 10 problems were encountered while building the effective model for org.mcmonkey:sentinel:2.9.0-SNAPSHOT
+[ERROR] 'dependencies.dependency.systemPath' for net.milkbowl.vault:Vault:jar must specify an absolute path but is ${project.basedir}/lib/Vault.jar @ 
+[ERROR] 'dependencies.dependency.systemPath' for com.tommytony:war:jar must specify an absolute path but is ${project.basedir}/lib/war.jar @ 
+[ERROR] 'dependencies.dependency.systemPath' for com.palmergames.bukkit:towny:jar must specify an absolute path but is ${project.basedir}/lib/towny.jar @ 
+[ERROR] 'dependencies.dependency.systemPath' for com.massivecraft:factions:jar must specify an absolute path but is ${basedir}/lib/Factions.jar @ 
+[ERROR] 'dependencies.dependency.systemPath' for com.massivecraft:massivecore:jar must specify an absolute path but is ${basedir}/lib/MassiveCore.jar @ 
+[ERROR] 'dependencies.dependency.systemPath' for com.shampaggon:crackshot:jar must specify an absolute path but is ${basedir}/lib/CrackShot.jar @ 
+[ERROR] 'dependencies.dependency.systemPath' for net.sacredlabyrinth.phaed.simpleclans:SimpleClans:jar must specify an absolute path but is ${basedir}/lib/SimpleClans.jar @ 
+[ERROR] 'dependencies.dependency.systemPath' for simplepets.brainsynder:SimplePets:jar must specify an absolute path but is ${basedir}/lib/SimplePets.jar @ 
+[ERROR] 'dependencies.dependency.systemPath' for com.sk89q:WorldEdit:jar must specify an absolute path but is ${basedir}/lib/WorldEdit.jar @ 
+[ERROR] 'dependencies.dependency.systemPath' for com.sk89q:WorldGuard:jar must specify an absolute path but is ${basedir}/lib/WorldGuard.jar @ 
+
+[WARNING] The POM for org.maxgamer:QuickShop:jar:5.1.2.5 is invalid, transitive dependencies (if any) will not be available: 7 problems were encountered while building the effective model for org.maxgamer:QuickShop:5.1.2.5-SNAPSHOT
+[ERROR] 'dependencies.dependency.systemPath' for me.minebuilders:clearlag:jar must specify an absolute path but is ${project.basedir}/lib/Clearlag-3.2.2.jar @ 
+[ERROR] 'dependencies.dependency.systemPath' for me.vagdedes.spartan:SpartanAPI:jar must specify an absolute path but is ${project.basedir}/lib/SpartanAPI-9.1.jar @ 
+[ERROR] 'dependencies.dependency.systemPath' for com.bekvon.bukkit.residence:Residence:jar must specify an absolute path but is ${project.basedir}/lib/Residence5.0.1.0.jar @ 
+[ERROR] 'dependencies.dependency.systemPath' for org.primesoft.blockshub:BlocksHub:jar must specify an absolute path but is ${project.basedir}/lib/BlocksHub-3.2.1.jar @ 
+[ERROR] 'dependencies.dependency.systemPath' for me.xanium:GemsEconomy:jar must specify an absolute path but is ${project.basedir}/lib/GemsEconomy-4.9.2.jar @ 
+[ERROR] 'dependencies.dependency.systemPath' for tne.tne:TheNewEconomy:jar must specify an absolute path but is ${project.basedir}/lib/TNE-0.1.1.17-PRE-2.jar @ 
+[ERROR] 'dependencies.dependency.systemPath' for com.iridium:IridiumSkyblock:jar must specify an absolute path but is ${project.basedir}/lib/IridiumSkyblock-3.2.3.jar @ 
+
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ QualityArmory ---
+[INFO] Deleting C:\Users\LoloCass\DiversoQualityArmory\target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ QualityArmory ---
+[INFO] Copying 4 resources from src\main\resources to target\classes
+[INFO] Copying 3 resources from src\main\resources\lang to target\classes\lang
+[INFO] Copying 145 resources from src to target\classes\src
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ QualityArmory ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 145 source files with javac [debug target 16] to target\classes
+[INFO] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/QAMain.java: Some input files use or override a deprecated API.
+[INFO] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/QAMain.java: Recompile with -Xlint:deprecation for details.
+[INFO] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/hooks/protection/implementation/WorldGuardHook.java: C:\Users\LoloCass\DiversoQualityArmory\src\main\java\me\zombie_striker\qg\hooks\protection\implementation\WorldGuardHook.java uses unchecked or unsafe operations.
+[INFO] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/hooks/protection/implementation/WorldGuardHook.java: Recompile with -Xlint:unchecked for details.
+[INFO] -------------------------------------------------------------
+[WARNING] COMPILATION WARNING : 
+[INFO] -------------------------------------------------------------
+[WARNING] location of system modules is not set in conjunction with -source 16
+  not setting the location of system modules may lead to class files that cannot run on JDK 16
+    --release 16 is recommended instead of -source 16 -target 16 because it sets the location of system modules automatically
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/hooks/CoreProtectHook.java:[34,109] getData() in org.bukkit.block.Block has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/hooks/CoreProtectHook.java:[57,111] getData() in org.bukkit.block.Block has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/QAMain.java:[348,94] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/QAMain.java:[356,94] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/QAMain.java:[629,13] getPluginLoader() in org.bukkit.plugin.java.JavaPlugin has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/armor/ArmorObject.java:[110,79] AttributeModifier(@org.jetbrains.annotations.NotNull java.lang.String,double,@org.jetbrains.annotations.NotNull org.bukkit.attribute.AttributeModifier.Operation) in org.bukkit.attribute.AttributeModifier has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/utils/GunRefillerRunnable.java:[98,80] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/utils/GunRefillerRunnable.java:[100,80] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/miscitems/Grenade.java:[142,110] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/projectiles/ExplodingRoundProjectile.java:[58,93] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/projectiles/ExplodingRoundProjectile.java:[60,101] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/config/ArmoryYML.java:[88,37] org.bukkit.SkullType in org.bukkit has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/miscitems/StickyGrenades.java:[67,136] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/miscitems/Flashbang.java:[50,110] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/chargers/PumpactionCharger.java:[44,96] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/chargers/PumpactionCharger.java:[45,96] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/chargers/PumpactionCharger.java:[61,96] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/chargers/PumpactionCharger.java:[62,96] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/reloaders/SingleBulletReloader.java:[71,78] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/miscitems/IncendaryGrenades.java:[56,110] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/handlers/MultiVersionLookup.java:[34,47] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/handlers/MultiVersionLookup.java:[46,50] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/handlers/MultiVersionLookup.java:[58,50] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/handlers/MultiVersionLookup.java:[70,49] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/chargers/BoltactionCharger.java:[44,104] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/chargers/BoltactionCharger.java:[60,104] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/miscitems/SmokeGrenades.java:[105,94] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/projectiles/MiniNukeProjectile.java:[41,77] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/projectiles/MiniNukeProjectile.java:[73,85] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/miscitems/ProxyMines.java:[91,126] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/projectiles/HomingRocketProjectile.java:[59,95] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/projectiles/HomingRocketProjectile.java:[85,103] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[566,78] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[610,78] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[802,99] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/miscitems/Molotov.java:[59,110] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/projectiles/RocketProjectile.java:[63,93] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/reloaders/PumpactionReloader.java:[76,78] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/utils/GunUtil.java:[201,115] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/utils/GunUtil.java:[206,99] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/utils/GunUtil.java:[215,107] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/utils/GunUtil.java:[220,91] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/utils/GunUtil.java:[769,112] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/utils/GunUtil.java:[770,112] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/utils/GunUtil.java:[771,112] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/utils/GunUtil.java:[773,112] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/utils/GunUtil.java:[777,96] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/utils/GunUtil.java:[778,96] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/utils/GunUtil.java:[779,96] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/utils/GunUtil.java:[832,88] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/utils/GunUtil.java:[834,88] valueOf(@org.jetbrains.annotations.NotNull java.lang.String) in org.bukkit.Sound has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/customitemmanager/qa/versions/V1_14/CustomGunItem.java:[104,62] AttributeModifier(@org.jetbrains.annotations.NotNull java.util.UUID,@org.jetbrains.annotations.NotNull java.lang.String,double,@org.jetbrains.annotations.NotNull org.bukkit.attribute.AttributeModifier.Operation) in org.bukkit.attribute.AttributeModifier has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/handlers/BlockCollisionUtil.java:[36,30] getData() in org.bukkit.block.Block has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/handlers/BlockCollisionUtil.java:[38,30] getData() in org.bukkit.block.Block has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/handlers/BlockCollisionUtil.java:[73,99] getData() in org.bukkit.block.Block has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/handlers/BlockCollisionUtil.java:[74,81] getData() in org.bukkit.block.Block has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/handlers/BlockCollisionUtil.java:[96,30] getData() in org.bukkit.block.Block has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/handlers/BlockCollisionUtil.java:[98,30] getData() in org.bukkit.block.Block has been deprecated and marked for removal
+[WARNING] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/handlers/BlockCollisionUtil.java:[100,34] getData() in org.bukkit.block.Block has been deprecated and marked for removal
+[INFO] 60 warnings 
+[INFO] -------------------------------------------------------------
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/utils/MagazineUtil.java:[29,19] reference to get is ambiguous
+  both method <T>get(org.bukkit.inventory.ItemStack,java.util.function.Function<de.tr7zw.changeme.nbtapi.iface.ReadableItemNBT,T>) in de.tr7zw.changeme.nbtapi.NBT and method get(org.bukkit.inventory.ItemStack,java.util.function.Consumer<de.tr7zw.changeme.nbtapi.iface.ReadableItemNBT>) in de.tr7zw.changeme.nbtapi.NBT match
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/utils/MagazineUtil.java:[33,19] reference to get is ambiguous
+  both method <T>get(org.bukkit.inventory.ItemStack,java.util.function.Function<de.tr7zw.changeme.nbtapi.iface.ReadableItemNBT,T>) in de.tr7zw.changeme.nbtapi.NBT and method get(org.bukkit.inventory.ItemStack,java.util.function.Consumer<de.tr7zw.changeme.nbtapi.iface.ReadableItemNBT>) in de.tr7zw.changeme.nbtapi.NBT match
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/utils/MagazineUtil.java:[37,19] reference to get is ambiguous
+  both method <T>get(org.bukkit.inventory.ItemStack,java.util.function.Function<de.tr7zw.changeme.nbtapi.iface.ReadableItemNBT,T>) in de.tr7zw.changeme.nbtapi.NBT and method get(org.bukkit.inventory.ItemStack,java.util.function.Consumer<de.tr7zw.changeme.nbtapi.iface.ReadableItemNBT>) in de.tr7zw.changeme.nbtapi.NBT match
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/utils/MagazineUtil.java:[41,19] reference to get is ambiguous
+  both method <T>get(org.bukkit.inventory.ItemStack,java.util.function.Function<de.tr7zw.changeme.nbtapi.iface.ReadableItemNBT,T>) in de.tr7zw.changeme.nbtapi.NBT and method get(org.bukkit.inventory.ItemStack,java.util.function.Consumer<de.tr7zw.changeme.nbtapi.iface.ReadableItemNBT>) in de.tr7zw.changeme.nbtapi.NBT match
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[185,51] cannot find symbol
+  symbol:   class ArmoryBaseObject
+  location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[203,41] cannot find symbol
+  symbol:   class QACustomItemInteractEvent
+  location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[203,79] cannot find symbol
+  symbol:   class QACustomItemInteractEvent
+  location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[264,45] cannot find symbol
+  symbol:   class ArmoryBaseObject
+  location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[265,35] cannot find symbol
+  symbol:   class ArmoryBaseObject
+  location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[290,112] cannot find symbol
+  symbol:   class AttachmentBase
+  location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[585,57] cannot find symbol
+  symbol:   class QAGunGiveEvent
+  location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[585,84] cannot find symbol
+  symbol:   class QAGunGiveEvent
+  location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[586,87] package QAGunGiveEvent does not exist
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[1127,17] cannot find symbol
+  symbol:   class QACustomItemInteractEvent
+  location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[1127,55] cannot find symbol
+  symbol:   class QACustomItemInteractEvent
+  location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[1220,47] cannot find symbol
+  symbol:   class ArmoryBaseObject
+  location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[1223,47] cannot find symbol
+  symbol:   class ArmoryBaseObject
+  location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[1248,51] cannot find symbol
+  symbol:   class ArmoryBaseObject
+  location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[1249,35] cannot find symbol
+  symbol:   class ArmoryBaseObject
+  location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[1253,51] cannot find symbol
+  symbol:   class ArmoryBaseObject
+  location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[1254,35] cannot find symbol
+  symbol:   class ArmoryBaseObject
+  location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[1284,30] cannot find symbol
+  symbol:   class GunRefillerRunnable
+  location: class me.zombie_striker.qg.listener.QAListener
+[INFO] 22 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  11.142 s
+[INFO] Finished at: 2026-02-19T21:16:47+01:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile (default-compile) on project QualityArmory: Compilation failure: Compilation failure: 
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/utils/MagazineUtil.java:[29,19] reference to get is ambiguous
+[ERROR]   both method <T>get(org.bukkit.inventory.ItemStack,java.util.function.Function<de.tr7zw.changeme.nbtapi.iface.ReadableItemNBT,T>) in de.tr7zw.changeme.nbtapi.NBT and method get(org.bukkit.inventory.ItemStack,java.util.function.Consumer<de.tr7zw.changeme.nbtapi.iface.ReadableItemNBT>) in de.tr7zw.changeme.nbtapi.NBT match
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/utils/MagazineUtil.java:[33,19] reference to get is ambiguous
+[ERROR]   both method <T>get(org.bukkit.inventory.ItemStack,java.util.function.Function<de.tr7zw.changeme.nbtapi.iface.ReadableItemNBT,T>) in de.tr7zw.changeme.nbtapi.NBT and method get(org.bukkit.inventory.ItemStack,java.util.function.Consumer<de.tr7zw.changeme.nbtapi.iface.ReadableItemNBT>) in de.tr7zw.changeme.nbtapi.NBT match
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/utils/MagazineUtil.java:[37,19] reference to get is ambiguous
+[ERROR]   both method <T>get(org.bukkit.inventory.ItemStack,java.util.function.Function<de.tr7zw.changeme.nbtapi.iface.ReadableItemNBT,T>) in de.tr7zw.changeme.nbtapi.NBT and method get(org.bukkit.inventory.ItemStack,java.util.function.Consumer<de.tr7zw.changeme.nbtapi.iface.ReadableItemNBT>) in de.tr7zw.changeme.nbtapi.NBT match
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/guns/utils/MagazineUtil.java:[41,19] reference to get is ambiguous
+[ERROR]   both method <T>get(org.bukkit.inventory.ItemStack,java.util.function.Function<de.tr7zw.changeme.nbtapi.iface.ReadableItemNBT,T>) in de.tr7zw.changeme.nbtapi.NBT and method get(org.bukkit.inventory.ItemStack,java.util.function.Consumer<de.tr7zw.changeme.nbtapi.iface.ReadableItemNBT>) in de.tr7zw.changeme.nbtapi.NBT match
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[185,51] cannot find symbol
+[ERROR]   symbol:   class ArmoryBaseObject
+[ERROR]   location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[203,41] cannot find symbol
+[ERROR]   symbol:   class QACustomItemInteractEvent
+[ERROR]   location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[203,79] cannot find symbol
+[ERROR]   symbol:   class QACustomItemInteractEvent
+[ERROR]   location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[264,45] cannot find symbol
+[ERROR]   symbol:   class ArmoryBaseObject
+[ERROR]   location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[265,35] cannot find symbol
+[ERROR]   symbol:   class ArmoryBaseObject
+[ERROR]   location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[290,112] cannot find symbol
+[ERROR]   symbol:   class AttachmentBase
+[ERROR]   location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[585,57] cannot find symbol
+[ERROR]   symbol:   class QAGunGiveEvent
+[ERROR]   location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[585,84] cannot find symbol
+[ERROR]   symbol:   class QAGunGiveEvent
+[ERROR]   location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[586,87] package QAGunGiveEvent does not exist
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[1127,17] cannot find symbol
+[ERROR]   symbol:   class QACustomItemInteractEvent
+[ERROR]   location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[1127,55] cannot find symbol
+[ERROR]   symbol:   class QACustomItemInteractEvent
+[ERROR]   location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[1220,47] cannot find symbol
+[ERROR]   symbol:   class ArmoryBaseObject
+[ERROR]   location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[1223,47] cannot find symbol
+[ERROR]   symbol:   class ArmoryBaseObject
+[ERROR]   location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[1248,51] cannot find symbol
+[ERROR]   symbol:   class ArmoryBaseObject
+[ERROR]   location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[1249,35] cannot find symbol
+[ERROR]   symbol:   class ArmoryBaseObject
+[ERROR]   location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[1253,51] cannot find symbol
+[ERROR]   symbol:   class ArmoryBaseObject
+[ERROR]   location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[1254,35] cannot find symbol
+[ERROR]   symbol:   class ArmoryBaseObject
+[ERROR]   location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] /C:/Users/LoloCass/DiversoQualityArmory/src/main/java/me/zombie_striker/qg/listener/QAListener.java:[1284,30] cannot find symbol
+[ERROR]   symbol:   class GunRefillerRunnable
+[ERROR]   location: class me.zombie_striker.qg.listener.QAListener
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
